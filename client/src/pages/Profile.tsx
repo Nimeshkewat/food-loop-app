@@ -1,0 +1,187 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, Mail, Plus, MapPin, Building, Globe } from "lucide-react";
+import { useRef, useState, type ChangeEvent } from "react";
+
+function Profile() {
+  const [profileData, setProfileData] = useState({
+    fullname: "John Doe",
+    email: "john@example.com",
+    address: "123 Main St",
+    city: "Mumbai",
+    country: "India",
+    profilePicture: "",
+  });
+
+  const imageRef = useRef<HTMLInputElement | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  const fileChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setSelectedImage(result);
+        setProfileData((prev) => ({ ...prev, profilePicture: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+    setProfileData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    setLoading(true);
+    // Add your API call/form submission logic here
+    setTimeout(() => setLoading(false), 1500); // Simulated delay
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+      {/* Header Section */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-6">
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => imageRef.current?.click()}
+          >
+            <Avatar className="md:w-32 md:h-32 w-24 h-24 border-2 border-gray-200">
+              <AvatarImage
+                src={selectedImage || profileData.profilePicture}
+                alt="Profile"
+                className="object-cover"
+              />
+              <AvatarFallback className="text-2xl font-bold bg-gray-100 text-gray-600">
+                {profileData.fullname.charAt(0) || "CN"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 rounded-full">
+              <Plus className="text-white w-8 h-8" />
+            </div>
+          </div>
+
+          <input
+            className="hidden"
+            type="file"
+            ref={imageRef}
+            onChange={fileChangeHandler}
+            accept="image/*"
+          />
+
+          <div className="flex flex-col">
+            <input
+              type="text"
+              name="fullname"
+              onChange={handleChange}
+              value={profileData.fullname}
+              className="font-bold text-3xl outline-none border-b-2 border-transparent focus:border-gray-300 bg-transparent py-1 w-full text-gray-800"
+            />
+            <span className="text-sm text-gray-400 mt-1">
+              Click name to edit
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <Card className="shadow-sm border-gray-200">
+          <CardContent className="flex items-center gap-4 p-4">
+            <Mail className="text-gray-400 w-6 h-6 shrink-0" />
+            <div className="w-full">
+              <Label className="text-xs text-gray-400 font-semibold uppercase">
+                Email Address
+              </Label>
+              <Input
+                type="email"
+                name="email"
+                value={profileData.email}
+                onChange={handleChange}
+                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-gray-200">
+          <CardContent className="flex items-center gap-4 p-4">
+            <MapPin className="text-gray-400 w-6 h-6 shrink-0" />
+            <div className="w-full">
+              <Label className="text-xs text-gray-400 font-semibold uppercase">
+                Address
+              </Label>
+              <Input
+                type="text"
+                name="address"
+                value={profileData.address}
+                onChange={handleChange}
+                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-gray-200">
+          <CardContent className="flex items-center gap-4 p-4">
+            <Building className="text-gray-400 w-6 h-6 shrink-0" />
+            <div className="w-full">
+              <Label className="text-xs text-gray-400 font-semibold uppercase">
+                City
+              </Label>
+              <Input
+                type="text"
+                name="city"
+                value={profileData.city}
+                onChange={handleChange}
+                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-gray-200 md:col-span-2">
+          <CardContent className="flex items-center gap-4 p-4">
+            <Globe className="text-gray-400 w-6 h-6 shrink-0" />
+            <div className="w-full">
+              <Label className="text-xs text-gray-400 font-semibold uppercase">
+                Country
+              </Label>
+              <Input
+                type="text"
+                name="country"
+                value={profileData.country}
+                onChange={handleChange}
+                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Submit Button */}
+      <div className="text-center mt-8">
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full md:w-1/3 py-6 text-md font-semibold"
+        >
+          {loading ? (
+            <Loader2 className="animate-spin mr-2" />
+          ) : (
+            "Update Profile"
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default Profile;

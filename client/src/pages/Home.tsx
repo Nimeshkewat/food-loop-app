@@ -1,10 +1,9 @@
-import Navbar from "@/components/common/Navbar";
-import React from "react";
+import HeroSection from "@/components/Home/HeroSection";
 
 function Home() {
   return (
     <div>
-      <Navbar />
+      <HeroSection />
     </div>
   );
 }

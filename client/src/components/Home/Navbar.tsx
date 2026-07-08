@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menubar,
   MenubarContent,
@@ -42,6 +42,7 @@ import { Separator } from "../ui/separator";
 function Navbar() {
   const admin = true;
   const loading = false;
+  const navigate = useNavigate();
 
   return (
     <div className="max-w-7xl w-full mx-auto">
@@ -102,7 +103,7 @@ function Navbar() {
               </span>
             </Link>
             <div>
-              <Avatar>
+              <Avatar onClick={() => navigate("/profile")}>
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
@@ -116,7 +117,7 @@ function Navbar() {
         </div>
         {/* mobile screen */}
         <div className="md:hidden lg:hidden">
-          <MobileNavbar loading={loading} />
+          <MobileNavbar loading={loading} navigate={navigate} />
         </div>
       </div>
     </div>
@@ -124,8 +125,13 @@ function Navbar() {
 }
 
 export default Navbar;
-
-const MobileNavbar = ({ loading }: { loading: boolean }) => {
+const MobileNavbar = ({
+  loading,
+  navigate,
+}: {
+  loading: boolean;
+  navigate: any;
+}) => {
   return (
     <Sheet>
       <SheetTrigger>
@@ -156,6 +162,7 @@ const MobileNavbar = ({ loading }: { loading: boolean }) => {
           <Link
             to="/profile"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => navigate("/profile")}
           >
             <User />
             <span>Profile</span>
