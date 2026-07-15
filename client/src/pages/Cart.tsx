@@ -1,7 +1,7 @@
 import { Minus, Plus } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
+import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
 import {
   Table,
   TableBody,
@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import CheckoutConfirmation from "./CheckoutConfirmation";
+} from "../components/ui/table";
+import CheckoutConfirmation from "../components/CheckoutConfirmation";
 import { useState } from "react";
 
 function Cart() {
@@ -65,7 +65,9 @@ function Cart() {
         <TableFooter>
           <TableRow>
             <TableCell colSpan={5}>Total</TableCell>
-            <TableCell className="text-right">₹400</TableCell>
+            <TableCell className="text-right text-2xl font-bold">
+              ₹400
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>

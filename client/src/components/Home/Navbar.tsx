@@ -35,9 +35,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "../ui/sheet";
 import { Separator } from "../ui/separator";
+import { useState } from "react";
 
 function Navbar() {
   const admin = true;
@@ -70,7 +70,7 @@ function Navbar() {
                         <Link to="/admin/menu">Menu</Link>
                       </MenubarItem>
                       <MenubarItem>
-                        <Link to="/admin/order">Order</Link>
+                        <Link to="/admin/orders">Order</Link>
                       </MenubarItem>
                     </MenubarGroup>
                   </MenubarContent>
@@ -117,7 +117,7 @@ function Navbar() {
         </div>
         {/* mobile screen */}
         <div className="md:hidden lg:hidden">
-          <MobileNavbar loading={loading} navigate={navigate} />
+          <MobileNavbar loading={loading} />
         </div>
       </div>
     </div>
@@ -125,19 +125,12 @@ function Navbar() {
 }
 
 export default Navbar;
-const MobileNavbar = ({
-  loading,
-  navigate,
-}: {
-  loading: boolean;
-  navigate: any;
-}) => {
+const MobileNavbar = ({ loading }: { loading: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Sheet>
-      <SheetTrigger>
-        {" "}
-        <Menu />{" "}
-      </SheetTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      {" "}
+      <Menu onClick={() => setIsOpen(true)} />{" "}
       <SheetContent showCloseButton={false}>
         <SheetHeader className="flex flex-row items-center justify-between">
           <SheetTitle>Main Logo</SheetTitle>
@@ -162,7 +155,7 @@ const MobileNavbar = ({
           <Link
             to="/profile"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
-            onClick={() => navigate("/profile")}
+            onClick={() => setIsOpen(false)}
           >
             <User />
             <span>Profile</span>
@@ -170,34 +163,39 @@ const MobileNavbar = ({
           <Link
             to="/order"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => setIsOpen(false)}
           >
             <HandPlatter />
             <span>Order</span>
           </Link>
           <Link
-            to="/profile"
+            to="/cart"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => setIsOpen(false)}
           >
             <ShoppingCart />
             <span>Cart</span>
           </Link>
           <Link
-            to="/profile"
+            to="/menu"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => setIsOpen(false)}
           >
             <SquareMenu />
             <span>Menu</span>
           </Link>
           <Link
-            to="/profile"
+            to="/admin/restaurant"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => setIsOpen(false)}
           >
             <UtensilsCrossed />
             <span>Restaurant</span>
           </Link>
           <Link
-            to="/profile"
+            to="/admin/orders"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            onClick={() => setIsOpen(false)}
           >
             <Package2Icon />
             <span>Restaurant Orders</span>

@@ -9,7 +9,10 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import SearchPage from "./pages/SearchPage";
 import RestaurantDetails from "./components/RestaurantDetails";
-import Cart from "./components/Cart";
+import Cart from "./pages/Cart";
+import Restaurant from "./pages/admin/Restaurant";
+import AddMenu from "./pages/admin/AddMenu";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
         <Route path="/search/:searchText" element={<SearchPage />} />
         <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/admin/restaurant" element={<Restaurant />} />
+        <Route path="/admin/menu" element={<AddMenu />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
       </Route>
 
       <Route path="/login" element={<Login />} />
