@@ -15,10 +15,10 @@ function HeroSection() {
     navigate(`/search/${search}`);
   };
   return (
-    <div className="flex flex-col md:flex-row max-w-7xl mx-auto  md:p-10 rounded-lg items-center justify-center m-4 gap-20">
-      <div className="flex flex-col gap-10 md:w-[40%]">
+    <div className="px-3 flex flex-col md:flex-row max-w-7xl mx-auto  md:p-10 rounded-lg items-center justify-center m-4 gap-20">
+      <div className="flex flex-col gap-10 md:w-[50%]">
         <div className="flex flex-col gap-2">
-          <h1 className="font-bold md:font-extrabold md:text-5xl text-3xl">
+          <h1 className="font-bold md:font-extrabold md:text-5xl text-2xl">
             Order food anytime & anywhere
           </h1>
           <p className="text-gray-500">

@@ -55,7 +55,7 @@ function Navbar() {
           <div className="flex items-center gap-6">
             <Link to="/">Home</Link>
             <Link to="/profile">Profile</Link>
-            <Link to="/order/status">Order</Link>
+            <Link to="/order-status">Order</Link>
 
             {admin && (
               <Menubar>
@@ -161,7 +161,7 @@ const MobileNavbar = ({ loading }: { loading: boolean }) => {
             <span>Profile</span>
           </Link>
           <Link
-            to="/order"
+            to="/order-status"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
             onClick={() => setIsOpen(false)}
           >
@@ -177,7 +177,7 @@ const MobileNavbar = ({ loading }: { loading: boolean }) => {
             <span>Cart</span>
           </Link>
           <Link
-            to="/menu"
+            to="/admin/menu"
             className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
             onClick={() => setIsOpen(false)}
           >
