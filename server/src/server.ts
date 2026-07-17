@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
+import restaurantRouter from "./routes/restaurantRoutes.js";
 
 //* App instance and Port
 const app = express();
@@ -16,12 +17,8 @@ if (!process.env.FRONTEND_URL) {
 }
 
 //* Middlewares
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  }),
-);
+const corsOption = { origin: process.env.FRONTEND_URL, credentials: true };
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
@@ -32,6 +29,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/restaurant", restaurantRouter);
 
 app.listen(PORT, () => {
   connectDB();

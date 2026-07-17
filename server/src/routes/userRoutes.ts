@@ -10,6 +10,7 @@ import {
   verifyEmail,
 } from "../controllers/userController.js";
 import isAuthenticated from "../middlewares/auth.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 //* base url /api/v1/users
@@ -22,6 +23,11 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 router.get("/check-auth", isAuthenticated, checkAuth);
-router.patch("/update-profile", isAuthenticated, updateProfile);
+router.patch(
+  "/update-profile",
+  isAuthenticated,
+  upload.single("profile"),
+  updateProfile,
+);
 
 export default router;
