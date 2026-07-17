@@ -1,9 +1,11 @@
 import "dotenv/config";
+import "./utils/cloudinary.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import connectDB from "./config/db";
+import connectDB from "./config/db.js";
+import userRouter from "./routes/userRoutes.js";
 
 //* App instance and Port
 const app = express();
@@ -28,6 +30,8 @@ app.use(helmet());
 app.get("/", (req, res) => {
   res.send("API Running !");
 });
+
+app.use("/api/v1/users", userRouter);
 
 app.listen(PORT, () => {
   connectDB();

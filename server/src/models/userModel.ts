@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface IUser {
   fullname: string;
@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema<IUserDocument>(
     //* Advanced authentication
     lastLogin: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
     },
     isVerified: {
       type: Boolean,
