@@ -27,6 +27,11 @@ export interface IOrder extends Document {
     | "preparing"
     | "outfordelivery"
     | "delivered";
+
+  //! Razorpay specific fields
+  razorpayOrderId: string;
+  razorpayPaymentId?: string;
+  paymentStatus: "unpaid" | "paid" | "failed";
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(
@@ -56,6 +61,10 @@ const orderSchema = new mongoose.Schema<IOrder>(
         quantity: { type: Number, required: true },
       },
     ],
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
     status: {
       type: String,
       enum: [
@@ -66,6 +75,16 @@ const orderSchema = new mongoose.Schema<IOrder>(
         "delivered",
       ],
       default: "pending",
+    },
+    razorpayOrderId: {
+      type: String,
+      required: true,
+    },
+    razorpayPaymentId: String,
+    paymentStatus: {
+      type: String,
+      enum: ["unpaid", "paid", "failed"],
+      default: "unpaid",
     },
   },
   { timestamps: true },
