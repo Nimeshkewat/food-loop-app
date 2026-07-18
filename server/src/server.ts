@@ -5,8 +5,10 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import connectDB from "./config/db.js";
+
 import userRouter from "./routes/userRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
+import menuRouter from "./routes/menuRoutes.js";
 
 //* App instance and Port
 const app = express();
@@ -30,6 +32,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/restaurant", restaurantRouter);
+app.use("/api/v1/menu", menuRouter);
 
 app.listen(PORT, () => {
   connectDB();

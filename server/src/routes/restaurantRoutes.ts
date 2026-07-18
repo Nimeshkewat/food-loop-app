@@ -14,13 +14,9 @@ import upload from "../middlewares/multer.js";
 const router = express.Router();
 
 router.post("/", isAuthenticated, upload.single("imageFile"), createRestaurant);
-router.get("/", getRestaurant);
-router.patch(
-  "/",
-  isAuthenticated,
-  upload.single("imageFile"),
-  updateRestaurant,
-);
+router.get("/", isAuthenticated, getRestaurant);
+router.put("/", isAuthenticated, upload.single("imageFile"), updateRestaurant);
+
 router.get("/order", isAuthenticated, getRestaurantOrders);
 router.patch("/order/:orderId/status", isAuthenticated, updateOrderStatus);
 router.get("/search/:searchText", getRestaurantWithFilters);

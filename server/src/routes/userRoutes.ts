@@ -26,7 +26,7 @@ router.get("/check-auth", isAuthenticated, checkAuth);
 router.patch(
   "/update-profile",
   isAuthenticated,
-  upload.single("profile"),
+  upload.single("imageFile"),
   updateProfile,
 );
 

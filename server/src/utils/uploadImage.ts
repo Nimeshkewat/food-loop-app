@@ -13,7 +13,7 @@ const uploadToCloudinary = (req: MulterRequest): Promise<UploadApiResponse> => {
     }
 
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "Restaurant_image" },
+      { folder: "Restaurant_image", overwrite: true },
       (error, result) => {
         if (error) {
           return reject(error);
@@ -21,7 +21,7 @@ const uploadToCloudinary = (req: MulterRequest): Promise<UploadApiResponse> => {
         if (!result) {
           return reject(new Error("Cloduinary upload failed with no result."));
         }
-        resolve(result);
+        return resolve(result);
       },
     );
     stream.end(req.file?.buffer);
