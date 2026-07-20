@@ -175,3 +175,18 @@ export const webhook = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: errorMessage });
   }
 };
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+    const orders = await Order.find({ user: id })
+      .populate("user restaurant")
+      .exec();
+
+    res.status(200).json({ success: true, data: orders });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ success: false, message: errorMessage });
+  }
+};

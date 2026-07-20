@@ -4,7 +4,7 @@ import { Loader2, Mail } from "lucide-react";
 import { useState, type SubmitEvent } from "react";
 import { Link } from "react-router-dom";
 
-function ForgorPassword() {
+function ForgotPassword() {
   const loading = false;
   const [email, setEmail] = useState<string>("");
 
@@ -52,4 +52,4 @@ function ForgorPassword() {
   );
 }
 
-export default ForgorPassword;
+export default ForgotPassword;

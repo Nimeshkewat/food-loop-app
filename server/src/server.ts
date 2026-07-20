@@ -14,7 +14,7 @@ import { webhook } from "./controllers/orderController.js";
 
 //* App instance and Port
 const app = express();
-const PORT = process.env.PROT || 3000;
+const PORT = process.env.PORT || 3000;
 
 //* No auth middleware — Razorpay's servers call this directly.
 //* Raw body parsing is required here so the signature check in the
@@ -26,9 +26,9 @@ app.use(
 );
 
 //* Middlewares
+app.use(express.json());
 const corsOption = { origin: process.env.FRONTEND_URL!, credentials: true };
 app.use(cors(corsOption));
-app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
 

@@ -1,24 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useLogin } from "@/hooks/auth/useLogin";
 import { userLoginSchema } from "@/schema/userSchema";
 import { Loader2, LockKeyhole, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import * as z from "zod";
 
-interface LoginInputState {
+export interface LoginInputState {
   email: string;
   password: string;
 }
 
 function Login() {
-  const loading = false;
   const [input, setInput] = useState<LoginInputState>({
     email: "",
     password: "",
   });
   const [inputErrors, setInputErrors] = useState<Partial<LoginInputState>>({});
+  const [apiError, setApiError] = useState<string | undefined>("");
+  const navigate = useNavigate();
+  const { mutate, isPending } = useLogin();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,15 +41,33 @@ function Login() {
       return;
     }
     setInputErrors({});
+
+    //* Api implementation
+    mutate(input, {
+      onSuccess: (data) => {
+        console.log(data);
+        toast.success(data?.message);
+        setInput({ email: "", password: "" });
+        navigate("/");
+      },
+      onError: (error: any) => {
+        setApiError(error?.response?.data?.message || "Login failed");
+      },
+    });
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex  items-center justify-center min-h-screen">
       <form
         onSubmit={handleSubmit}
         className=" md:p-8 p-4 mx-4  w-full max-w-md md:border border-gray-200 rounded-lg"
       >
         <h1 className="text-center font-bold text-2xl mb-4">Javascript Eats</h1>
+        {apiError && (
+          <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+            {apiError}
+          </div>
+        )}
         <div className="mb-4 space-y-4">
           <div className="relative">
             <Input
@@ -81,8 +103,8 @@ function Login() {
           </div>
         </div>
         <div>
-          <Button disabled={loading} className="w-full" type="submit">
-            {loading ? <Loader2 className="animate-spin" /> : "Login"}
+          <Button disabled={isPending} className="w-full" type="submit">
+            {isPending ? <Loader2 className="animate-spin" /> : "Login"}
           </Button>
         </div>
         <p className="mt-2 text-center">

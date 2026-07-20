@@ -18,7 +18,6 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // TODO: Generate a real crypto token here if using email verification
     const verificationToken = Math.floor(
       100000 + Math.random() * 900000,
@@ -36,7 +35,7 @@ export const register = async (req: Request, res: Response) => {
     // TODO: await sendEmailVerificationEmail
     await transporter.sendMail({
       from: process.env.SENDER_EMAIL,
-      to: user.email || email,
+      to: email,
       subject: "Veriy your email",
       text: `your 6-digiti verification code: ${verificationToken}`,
       html: "<b>Html body</b>",
@@ -265,7 +264,7 @@ export const checkAuth = async (req: Request, res: Response) => {
         .json({ success: false, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true, user });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

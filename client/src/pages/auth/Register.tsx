@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useRegister } from "@/hooks/auth/useRegister";
 import { userRegisterSchema } from "@/schema/userSchema";
 import { Loader2, LockKeyhole, Mail, PhoneOutgoing, User } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import * as z from "zod";
 
-interface RegisterInputState {
+export interface RegisterInputState {
   fullname: string;
   email: string;
   password: string;
@@ -15,17 +17,19 @@ interface RegisterInputState {
 }
 
 function Register() {
-  const loading = false;
+  const navigate = useNavigate();
   const [input, setInput] = useState<RegisterInputState>({
     fullname: "",
     email: "",
     password: "",
     contact: "",
   });
+  const [apiError, setApiError] = useState<string | undefined>("");
   const [inputErrors, setInputErrors] = useState<Partial<RegisterInputState>>(
     {},
   );
 
+  const { mutate, isPending } = useRegister();
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput((prev) => ({ ...prev, [name]: value }));
@@ -46,9 +50,19 @@ function Register() {
       return;
     }
     setInputErrors({});
-    //* Api implementation
-  };
 
+    //* Api implementation
+    mutate(input, {
+      onSuccess: (data) => {
+        toast.success(data?.message);
+        setInput({ fullname: "", email: "", password: "", contact: "" });
+        navigate("/login");
+      },
+      onError: (error: any) => {
+        setApiError(error?.response?.data?.nessage || "Register failed");
+      },
+    });
+  };
   return (
     <div className="flex items-center justify-center min-h-screen">
       <form
@@ -56,6 +70,11 @@ function Register() {
         className=" md:p-8 p-4 mx-4  w-full max-w-md md:border border-gray-200 rounded-lg"
       >
         <h1 className="text-center font-bold text-2xl mb-4">Javascript Eats</h1>
+        {apiError && (
+          <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+            {apiError}
+          </div>
+        )}
         <div className="mb-4 space-y-4">
           <div className="relative">
             <Input
@@ -123,8 +142,8 @@ function Register() {
           </div>
         </div>
         <div>
-          <Button disabled={loading} className="w-full" type="submit">
-            {loading ? <Loader2 className="animate-spin" /> : "Register"}
+          <Button disabled={isPending} className="w-full" type="submit">
+            {isPending ? <Loader2 className="animate-spin" /> : "Register"}
           </Button>
         </div>
         <Separator />

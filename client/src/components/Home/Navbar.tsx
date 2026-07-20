@@ -38,11 +38,14 @@ import {
 } from "../ui/sheet";
 import { Separator } from "../ui/separator";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthProvider";
 
 function Navbar() {
   const admin = true;
   const loading = false;
   const navigate = useNavigate();
+
+  // const { isAuthenticated } = useAuth();
 
   return (
     <div className="max-w-7xl w-full mx-auto">
