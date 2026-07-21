@@ -3,18 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useRegister } from "@/hooks/auth/useRegister";
 import { userRegisterSchema } from "@/schema/userSchema";
+import type { RegisterInputState } from "@/types/auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, LockKeyhole, Mail, PhoneOutgoing, User } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
-
-export interface RegisterInputState {
-  fullname: string;
-  email: string;
-  password: string;
-  contact: string;
-}
 
 function Register() {
   const navigate = useNavigate();
@@ -24,12 +19,14 @@ function Register() {
     password: "",
     contact: "",
   });
-  const [apiError, setApiError] = useState<string | undefined>("");
+  const [apiError, setApiError] = useState("");
   const [inputErrors, setInputErrors] = useState<Partial<RegisterInputState>>(
     {},
   );
 
   const { mutate, isPending } = useRegister();
+  const queryClient = useQueryClient();
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput((prev) => ({ ...prev, [name]: value }));
@@ -53,7 +50,8 @@ function Register() {
 
     //* Api implementation
     mutate(input, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
         toast.success(data?.message);
         setInput({ fullname: "", email: "", password: "", contact: "" });
         navigate("/login");

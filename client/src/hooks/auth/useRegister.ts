@@ -1,5 +1,6 @@
 import api from "@/axios";
-import type { RegisterInputState } from "@/pages/auth/Register";
+import type { ApiError } from "@/types/api";
+import type { RegisterInputState, RegisterResponse } from "@/types/auth";
 import { useMutation } from "@tanstack/react-query";
 
 const register = async (input: RegisterInputState) => {
@@ -8,7 +9,7 @@ const register = async (input: RegisterInputState) => {
 };
 
 export const useRegister = () => {
-  return useMutation({
+  return useMutation<RegisterResponse, ApiError, RegisterInputState>({
     mutationFn: register,
   });
 };

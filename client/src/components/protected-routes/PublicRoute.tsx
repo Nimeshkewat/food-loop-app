@@ -1,11 +1,11 @@
 import { useAuth } from "@/context/AuthProvider";
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+import Loader from "../ui/Loader";
 
 function PublicRoute({ children }: { children: ReactNode }) {
-  const { isloading, isAuthenticated } = useAuth();
-  //*  waiting for check-auth api to complete
-  if (isloading) return;
+  const { isLoading, isAuthenticated } = useAuth();
+  if (isLoading) return <Loader />;
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

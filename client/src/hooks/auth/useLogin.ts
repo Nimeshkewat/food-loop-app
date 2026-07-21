@@ -1,5 +1,6 @@
 import api from "@/axios";
-import type { LoginInputState } from "@/pages/auth/Login";
+import type { ApiError } from "@/types/api";
+import type { LoginInputState, LoginResponse } from "@/types/auth";
 import { useMutation } from "@tanstack/react-query";
 
 const login = async (input: LoginInputState) => {
@@ -8,7 +9,7 @@ const login = async (input: LoginInputState) => {
 };
 
 export const useLogin = () => {
-  return useMutation({
+  return useMutation<LoginResponse, ApiError, LoginInputState>({
     mutationFn: login,
   });
 };

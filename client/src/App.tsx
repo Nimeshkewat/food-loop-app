@@ -17,12 +17,19 @@ import Success from "./pages/Success";
 import PublicRoute from "./components/protected-routes/PublicRoute";
 import PrivateRoute from "./components/protected-routes/PrivateRoute";
 import AdminRoute from "./components/protected-routes/AdminRoute";
+import { useAuth } from "./context/AuthProvider";
+import Loader from "./components/ui/Loader";
 
 function App() {
+  const { isLoading } = useAuth();
+  if (isLoading) return <Loader />;
+
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
+        <Route path="/search/:searchText" element={<SearchPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route
           path="/profile"
           element={
@@ -31,8 +38,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/search/:searchText" element={<SearchPage />} />
-        <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route
           path="/cart"
           element={

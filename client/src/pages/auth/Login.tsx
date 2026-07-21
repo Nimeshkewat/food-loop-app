@@ -3,16 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { userLoginSchema } from "@/schema/userSchema";
+import type { LoginInputState } from "@/types/auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, LockKeyhole, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
-
-export interface LoginInputState {
-  email: string;
-  password: string;
-}
 
 function Login() {
   const [input, setInput] = useState<LoginInputState>({
@@ -20,9 +17,11 @@ function Login() {
     password: "",
   });
   const [inputErrors, setInputErrors] = useState<Partial<LoginInputState>>({});
-  const [apiError, setApiError] = useState<string | undefined>("");
+  const [apiError, setApiError] = useState("");
+
   const navigate = useNavigate();
   const { mutate, isPending } = useLogin();
+  const queryClient = useQueryClient();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,13 +43,13 @@ function Login() {
 
     //* Api implementation
     mutate(input, {
-      onSuccess: (data) => {
-        console.log(data);
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
         toast.success(data?.message);
         setInput({ email: "", password: "" });
         navigate("/");
       },
-      onError: (error: any) => {
+      onError: (error) => {
         setApiError(error?.response?.data?.message || "Login failed");
       },
     });
