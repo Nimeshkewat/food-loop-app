@@ -1,25 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/hooks/auth/useForgotPassword";
+import { userForgotPasswordSchema } from "@/schema/userSchema";
 import type { ForgotPasswordInputState } from "@/types/auth";
 import { Loader2, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import * as z from "zod";
 
 function ForgotPassword() {
   const [input, setInput] = useState<ForgotPasswordInputState>({ email: "" });
+  const [inputErrors, setInputErrors] = useState<
+    Partial<ForgotPasswordInputState>
+  >({});
   const [apiError, setApiError] = useState("");
-  const { mutate, isPending } = useForgotPassword();
 
+  const { mutate, isPending } = useForgotPassword();
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const result = userForgotPasswordSchema.safeParse(input);
+    if (!result.success) {
+      const { fieldErrors } = z.flattenError(result.error);
+      setInputErrors({ email: fieldErrors.email?.[0] });
+      return;
+    }
+    setInputErrors({});
     setApiError("");
+
+    //* Api implementation
     mutate(input, {
       onSuccess: (data) => {
-        console.log(data);
+        toast.success(data?.message || "Password link sent");
         setInput({ email: "" });
-        toast.success(data?.message);
       },
       onError: (error) => {
         setApiError(error?.response?.data?.message || "Forgot password failed");
@@ -53,8 +67,12 @@ function ForgotPassword() {
                   [e.target.name]: e.target.value,
                 }))
               }
-              required
             />
+            {inputErrors.email && (
+              <p className="text-red-500 text-xs mt-1 pl-1 block">
+                {inputErrors.email}
+              </p>
+            )}
             <Mail className="absolute inset-y-1 left-2 text-gray-500 pointer-events-none" />
           </div>
         </div>

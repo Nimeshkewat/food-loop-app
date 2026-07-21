@@ -2,7 +2,7 @@ import Login from "./pages/auth/Login";
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Register from "./pages/auth/Register";
-import ForgotPassword from "./pages/auth/ForgorPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import Home from "./pages/Home";
@@ -107,7 +107,7 @@ function App() {
         }
       />
       <Route
-        path="/reset-password/:id"
+        path="/reset-password/:token"
         element={
           <PublicRoute>
             <ResetPassword />
