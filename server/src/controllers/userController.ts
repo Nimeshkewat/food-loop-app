@@ -5,6 +5,9 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
 import transporter from "../utils/nodemailer.js";
+import uploadToCloudinary from "../utils/uploadImage.js";
+import { resetPasswordEmail } from "../emails/resetPasswordEmail.js";
+import { resetPasswordSuccess } from "../emails/resetPasswordSuccess.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -38,7 +41,7 @@ export const register = async (req: Request, res: Response) => {
       to: email,
       subject: "Veriy your email",
       text: `your 6-digiti verification code: ${verificationToken}`,
-      html: "<b>Html body</b>",
+      html: "<h1>Html body</h1>",
     });
 
     res
@@ -68,19 +71,12 @@ export const login = async (req: Request, res: Response) => {
         .json({ success: false, message: "Incorrect email or password" });
     }
 
-    if (!process.env.JWT_SECRET) {
-      return res.status(500).json({
-        success: false,
-        message: "JWT Secret configuration missing on server.",
-      });
-    }
-
     const token = jwt.sign(
       {
         id: user._id,
         isAdmin: user.isAdmin,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
       { expiresIn: "3d" },
     );
 
@@ -97,7 +93,6 @@ export const login = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: `Welcome back ${user.fullname}`,
-      data: { name: user.fullname, email: user.email, isAdmin: user.isAdmin },
     });
   } catch (error) {
     const errorMessage =
@@ -152,7 +147,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Account verified successfully",
-      data: user,
+      user,
     });
   } catch (error) {
     const errorMessage =
@@ -183,13 +178,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     await user.save();
 
     // TODO: Send Password Reset Link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${hashedToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${plainToken}`;
     await transporter.sendMail({
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Reset your password",
-      text: `Click this link ${resetLink}`,
-      html: "<b>Html body</b>",
+      html: resetPasswordEmail(resetLink, user.fullname),
     });
 
     res.status(200).json({
@@ -239,7 +233,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Password reset successfully",
-      html: "<b>Html body</b>",
+      html: resetPasswordSuccess(user.fullname),
     });
 
     res.status(200).json({
@@ -285,22 +279,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       });
     }
 
-    const uploadToCloudinary = (): Promise<any> => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "Profile_Picture" },
-          (error, result) => {
-            if (error) {
-              return reject(error);
-            }
-            resolve(result);
-          },
-        );
-        stream.end(req.file?.buffer);
-      });
-    };
-
-    const result = await uploadToCloudinary();
+    const result = await uploadToCloudinary(req);
     profilePictureUrl = result.secure_url;
 
     const user = await User.findByIdAndUpdate(
@@ -320,7 +299,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      data: user,
+      user,
     });
   } catch (error) {
     const errorMessage =
