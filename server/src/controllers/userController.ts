@@ -3,11 +3,10 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { v2 as cloudinary } from "cloudinary";
 import transporter from "../utils/nodemailer.js";
 import uploadToCloudinary from "../utils/uploadImage.js";
 import { resetPasswordEmail } from "../emails/resetPasswordEmail.js";
-import { resetPasswordSuccess } from "../emails/resetPasswordSuccess.js";
+import { passwordResetSuccessEmail } from "../emails/passwordResetSuccessEmail .js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -183,7 +182,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Reset your password",
-      html: resetPasswordEmail(resetLink, user.fullname),
+      html: resetPasswordEmail(resetLink),
     });
 
     res.status(200).json({
@@ -233,7 +232,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Password reset successfully",
-      html: resetPasswordSuccess(user.fullname),
+      html: passwordResetSuccessEmail(user.fullname),
     });
 
     res.status(200).json({
