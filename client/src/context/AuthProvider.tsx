@@ -1,52 +1,30 @@
-import axios from "axios";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCheckAuth } from "@/hooks/auth/useCheckAuth";
+import { createContext, useContext, type ReactNode } from "react";
 
 interface AuthContextTypes {
-  isloading: boolean;
+  isLoading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isError: boolean;
+  error: Error | null;
 }
 
 const AuthContext = createContext<AuthContextTypes | undefined>(undefined);
 
 function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isloading, setIsLoading] = useState(true); //* start true to handle the refresh case
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data, isLoading, isError, error } = useCheckAuth();
+  const isAuthenticated = !isError && data?.user ? true : false;
+  const isAdmin = !isError && data?.user?.isAdmin ? true : false;
 
-  useEffect(() => {
-    const verifyUserSession = async () => {
-      try {
-        const { data } = await axios.get(
-          "http://localhost:4000/api/v1/users/check-auth",
-          { withCredentials: true },
-        );
-        console.log(data);
-        if (data.success) {
-          setIsAuthenticated(true);
-          setIsAdmin(data?.user?.isAdmin);
-        }
-      } catch (error: any) {
-        console.log(error?.response?.data?.message || "Unauthorized");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    verifyUserSession();
-  }, []);
-
+  if (isError) {
+    console.log(error.response?.data.message || error?.message);
+  }
   const value = {
-    isloading,
-    setIsLoading,
+    isLoading,
     isAuthenticated,
-    setIsAuthenticated,
     isAdmin,
+    isError,
+    error,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
