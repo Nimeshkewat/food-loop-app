@@ -4,30 +4,53 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Mail, Plus, MapPin, Building, Globe } from "lucide-react";
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import type { ProfileInputState } from "@/types/auth";
+import { useProfile } from "@/hooks/auth/useProfile";
+import { useProfileUpdate } from "@/hooks/auth/useProfileUpdate";
+import { useQueryClient } from "@tanstack/react-query";
+import Loader from "@/components/ui/Loader";
+import { toast } from "sonner";
 
 function Profile() {
-  const [profileData, setProfileData] = useState({
-    fullname: "John Doe",
-    email: "john@example.com",
-    address: "123 Main St",
-    city: "Mumbai",
-    country: "India",
+  const { data, isLoading } = useProfile();
+  const { mutate, isPending } = useProfileUpdate();
+  const queryClient = useQueryClient();
+
+  const [profileData, setProfileData] = useState<ProfileInputState>({
+    fullname: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
     profilePicture: "",
   });
 
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [apiError, setApiError] = useState("");
+
+  useEffect(() => {
+    if (data) {
+      setProfileData({
+        fullname: data?.user?.fullname || "",
+        email: data?.user?.email || "",
+        city: data?.user?.city || "",
+        country: data?.user?.country || "",
+        address: data?.user?.address || "",
+        profilePicture: data?.user?.profilePicture || "",
+      });
+    }
+  }, [data]);
 
   const fileChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file); // keep the actual File for upload
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setSelectedImage(result);
-        setProfileData((prev) => ({ ...prev, profilePicture: result }));
+        setSelectedImage(reader.result as string); // only for <img> preview
       };
       reader.readAsDataURL(file);
     }
@@ -39,14 +62,38 @@ function Profile() {
   };
 
   const handleSubmit = () => {
-    setLoading(true);
-    // Add your API call/form submission logic here
-    setTimeout(() => setLoading(false), 1500); // Simulated delay
+    setApiError("");
+    const formData = new FormData();
+    formData.append("fullname", profileData.fullname);
+    formData.append("email", profileData.email);
+    formData.append("address", profileData.address);
+    formData.append("city", profileData.city);
+    formData.append("country", profileData.country);
+    if (imageFile) {
+      formData.append("imageFile", imageFile);
+    }
+
+    mutate(formData, {
+      onSuccess: async (res) => {
+        toast.success(res.message);
+        await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      },
+      onError: (error) => {
+        setApiError(error?.response?.data?.message || "Profile update failed");
+      },
+    });
   };
+
+  if (isLoading) return <Loader />;
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-      {/* Header Section */}
+      {apiError && (
+        <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+          {apiError}
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-6">
           <div
@@ -60,7 +107,7 @@ function Profile() {
                 className="object-cover"
               />
               <AvatarFallback className="text-2xl font-bold bg-gray-100 text-gray-600">
-                {profileData.fullname.charAt(0) || "CN"}
+                {profileData.fullname?.charAt(0) || "CN"}
               </AvatarFallback>
             </Avatar>
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 rounded-full">
@@ -91,7 +138,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* Profile Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
         <Card className="shadow-sm border-gray-200">
           <CardContent className="flex items-center gap-4 p-4">
@@ -166,14 +212,13 @@ function Profile() {
         </Card>
       </div>
 
-      {/* Submit Button */}
       <div className="text-center mt-8">
         <Button
           onClick={handleSubmit}
-          disabled={loading}
+          disabled={isPending}
           className="w-full md:w-1/3 py-6 text-md font-semibold"
         >
-          {loading ? (
+          {isPending ? (
             <Loader2 className="animate-spin mr-2" />
           ) : (
             "Update Profile"

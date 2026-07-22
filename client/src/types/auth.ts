@@ -54,3 +54,25 @@ export interface ResetPasswordResponse {
   success: boolean;
   message: string;
 }
+
+// Get Profile
+export interface ProfileInputState {
+  fullname: string;
+  email: string;
+  address: string;
+  city: string;
+  country: string;
+  profilePicture: string;
+}
+
+export interface ProfileResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}

@@ -265,40 +265,66 @@ export const checkAuth = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProfile = async (req: Request, res: Response) => {
+export const getProfile = async (req: Request, res: Response) => {
   try {
     const { id } = req.user;
-    const { fullname, email, contact, address, city, country } = req.body;
 
-    let profilePictureUrl: string | undefined;
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Profile picture is required",
-      });
+    // const SELECT = "-isActive -password -verificationToken -verificationTokenExpiresAt";
+    const user = await User.findById(id)
+      .select("fullname email address city country profilePicture")
+      .exec();
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-
-    const result = await uploadToCloudinary(req);
-    profilePictureUrl = result.secure_url;
-
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        fullname,
-        email,
-        contact,
-        address,
-        city,
-        country,
-        profilePicture: profilePictureUrl,
-      },
-      { returnDocument: "after" },
-    ).select("-password");
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
       user,
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ success: false, message: errorMessage });
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+    const { fullname, email, contact, address, city, country } = req.body;
+
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    let profilePictureUrl: string | undefined;
+    if (req.file) {
+      const result = await uploadToCloudinary(req);
+      profilePictureUrl = result.secure_url;
+    }
+
+    user.fullname = fullname || user.fullname;
+    user.email = email || user.email;
+    user.contact = contact || user.contact;
+    user.address = address || user.address;
+    user.city = city || user.city;
+    user.country = country || user.country;
+    user.profilePicture = profilePictureUrl || user.profilePicture;
+
+    await user.save();
+
+    const updatedUser = await User.findById(user._id).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
     });
   } catch (error) {
     const errorMessage =

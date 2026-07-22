@@ -3,13 +3,14 @@ export interface User {
   fullname: string;
   email: string;
   contact: number;
+  address: string;
   city: string;
   country: string;
   profilePicture: string;
-  isAdmin: boolean;
-  isVerified: boolean;
-  verificationToken: string;
-  verificationTokenExpiresAt: string;
+  isAdmin?: boolean;
+  isVerified?: boolean;
+  verificationToken?: string;
+  verificationTokenExpiresAt?: string;
   lastLogin: string;
   createdAt: string;
   updatedAt: string;

@@ -2,6 +2,7 @@ import express from "express";
 import {
   checkAuth,
   forgotPassword,
+  getProfile,
   login,
   logout,
   register,
@@ -23,6 +24,8 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 router.get("/check-auth", isAuthenticated, checkAuth);
+
+router.get("/profile", isAuthenticated, getProfile);
 router.patch(
   "/update-profile",
   isAuthenticated,
