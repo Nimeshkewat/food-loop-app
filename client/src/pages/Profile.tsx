@@ -26,6 +26,16 @@ function Profile() {
     profilePicture: "",
   });
 
+  // snapshot of last-saved values, used to detect real changes
+  const [originalData, setOriginalData] = useState<ProfileInputState>({
+    fullname: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
+    profilePicture: "",
+  });
+
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -33,24 +43,26 @@ function Profile() {
 
   useEffect(() => {
     if (data) {
-      setProfileData({
+      const fetched: ProfileInputState = {
         fullname: data?.user?.fullname || "",
         email: data?.user?.email || "",
         city: data?.user?.city || "",
         country: data?.user?.country || "",
         address: data?.user?.address || "",
         profilePicture: data?.user?.profilePicture || "",
-      });
+      };
+      setProfileData(fetched);
+      setOriginalData(fetched); // baseline to compare against
     }
   }, [data]);
 
   const fileChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file); // keep the actual File for upload
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSelectedImage(reader.result as string); // only for <img> preview
+        setSelectedImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -61,11 +73,17 @@ function Profile() {
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const hasChanges =
+    profileData.fullname !== originalData.fullname ||
+    profileData.address !== originalData.address ||
+    profileData.city !== originalData.city ||
+    profileData.country !== originalData.country ||
+    imageFile !== null;
+
   const handleSubmit = () => {
     setApiError("");
     const formData = new FormData();
     formData.append("fullname", profileData.fullname);
-    formData.append("email", profileData.email);
     formData.append("address", profileData.address);
     formData.append("city", profileData.city);
     formData.append("country", profileData.country);
@@ -77,6 +95,9 @@ function Profile() {
       onSuccess: async (res) => {
         toast.success(res.message);
         await queryClient.invalidateQueries({ queryKey: ["profile"] });
+        setImageFile(null);
+        setSelectedImage("");
+        setOriginalData(profileData);
       },
       onError: (error) => {
         setApiError(error?.response?.data?.message || "Profile update failed");
@@ -150,7 +171,7 @@ function Profile() {
                 type="email"
                 name="email"
                 value={profileData.email}
-                onChange={handleChange}
+                readOnly
                 className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
@@ -215,7 +236,7 @@ function Profile() {
       <div className="text-center mt-8">
         <Button
           onClick={handleSubmit}
-          disabled={isPending}
+          disabled={isPending || !hasChanges}
           className="w-full md:w-1/3 py-6 text-md font-semibold"
         >
           {isPending ? (

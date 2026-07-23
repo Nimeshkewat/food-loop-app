@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 function ResetPassword() {
+  const { mutate, isPending } = useResetPassword();
   const { token } = useParams();
   const navigate = useNavigate();
 
@@ -22,8 +23,6 @@ function ResetPassword() {
   const [inputErrors, setInputErros] = useState<
     Partial<ResetPasswordInputState>
   >({});
-
-  const { mutate, isPending } = useResetPassword();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));

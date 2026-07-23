@@ -3,7 +3,7 @@ import type { ApiError } from "@/types/api";
 import type { CheckAuthResponse } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 
-const checkAuth = async () => {
+const checkAuth = async (): Promise<CheckAuthResponse> => {
   const response = await api.get("/users/check-auth");
   return response.data;
 };

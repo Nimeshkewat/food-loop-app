@@ -10,13 +10,14 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 function ForgotPassword() {
+  const { mutate, isPending } = useForgotPassword();
+
   const [input, setInput] = useState<ForgotPasswordInputState>({ email: "" });
+  const [apiError, setApiError] = useState("");
   const [inputErrors, setInputErrors] = useState<
     Partial<ForgotPasswordInputState>
   >({});
-  const [apiError, setApiError] = useState("");
 
-  const { mutate, isPending } = useForgotPassword();
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 

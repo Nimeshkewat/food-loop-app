@@ -12,7 +12,10 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 function Register() {
+  const { mutate, isPending } = useRegister();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+
   const [input, setInput] = useState<RegisterInputState>({
     fullname: "",
     email: "",
@@ -23,9 +26,6 @@ function Register() {
   const [inputErrors, setInputErrors] = useState<Partial<RegisterInputState>>(
     {},
   );
-
-  const { mutate, isPending } = useRegister();
-  const queryClient = useQueryClient();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,14 +47,15 @@ function Register() {
       return;
     }
     setInputErrors({});
+    setApiError("");
 
     //* Api implementation
     mutate(input, {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
-        toast.success(data?.message);
         setInput({ fullname: "", email: "", password: "", contact: "" });
+        toast.success(data?.message);
         navigate("/login");
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
       },
       onError: (error: any) => {
         setApiError(error?.response?.data?.nessage || "Register failed");

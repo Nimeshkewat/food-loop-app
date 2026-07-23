@@ -12,16 +12,17 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 function Login() {
+  const navigate = useNavigate();
+  const { mutate, isPending } = useLogin();
+  const queryClient = useQueryClient();
+
   const [input, setInput] = useState<LoginInputState>({
     email: "",
     password: "",
   });
+
   const [inputErrors, setInputErrors] = useState<Partial<LoginInputState>>({});
   const [apiError, setApiError] = useState("");
-
-  const navigate = useNavigate();
-  const { mutate, isPending } = useLogin();
-  const queryClient = useQueryClient();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,14 +41,15 @@ function Login() {
       return;
     }
     setInputErrors({});
+    setApiError("");
 
     //* Api implementation
     mutate(input, {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
-        toast.success(data?.message);
         setInput({ email: "", password: "" });
+        toast.success(data?.message);
         navigate("/");
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
       },
       onError: (error) => {
         setApiError(error?.response?.data?.message || "Login failed");
