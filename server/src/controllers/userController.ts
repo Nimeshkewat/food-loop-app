@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import transporter from "../utils/nodemailer.js";
 import uploadToCloudinary from "../utils/uploadImage.js";
-import { resetPasswordEmail } from "../emails/resetPasswordEmail.js";
-import { passwordResetSuccessEmail } from "../emails/passwordResetSuccessEmail .js";
+import { generateToken } from "../utils/generateToken.js";
+import {
+  sendPasswordResetLinkEmail,
+  sendPasswordResetSuccessEmail,
+  sendVerificationEmail,
+  sendVerificationSuccessEmail,
+} from "../utils/sendEmail.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -34,14 +37,8 @@ export const register = async (req: Request, res: Response) => {
       verificationTokenExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
     });
 
-    // TODO: await sendEmailVerificationEmail
-    await transporter.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject: "Veriy your email",
-      text: `your 6-digiti verification code: ${verificationToken}`,
-      html: "<h1>Html body</h1>",
-    });
+    // TODO: await sendVerificationEmail
+    await sendVerificationEmail(email, verificationToken);
 
     res
       .status(201)
@@ -56,7 +53,7 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, isActive: true });
     if (!user) {
       return res
         .status(404)
@@ -70,15 +67,7 @@ export const login = async (req: Request, res: Response) => {
         .json({ success: false, message: "Incorrect email or password" });
     }
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        isAdmin: user.isAdmin,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "3d" },
-    );
-
+    const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -121,6 +110,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const user = await User.findOne({
       verificationToken: verificationCode,
       verificationTokenExpiresAt: { $gt: Date.now() },
+      isActive: true,
     }).select("-password");
 
     if (!user) {
@@ -136,12 +126,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     await user.save();
 
     // TODO: Send welcome email
-    await transporter.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Welcome to this restaurant website",
-      html: "<b>Html body</b>",
-    });
+    await sendVerificationSuccessEmail(user.email);
 
     res.status(200).json({
       success: true,
@@ -159,7 +144,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, isActive: true });
     if (!user) {
       return res
         .status(404)
@@ -178,12 +163,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // TODO: Send Password Reset Link
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${plainToken}`;
-    await transporter.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Reset your password",
-      html: resetPasswordEmail(resetLink),
-    });
+    await sendPasswordResetLinkEmail(user.email, resetLink);
 
     res.status(200).json({
       success: true,
@@ -212,6 +192,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordTokenExpiresAt: { $gt: Date.now() },
+      isActive: true,
     });
 
     if (!user) {
@@ -228,12 +209,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     await user.save();
 
     // TODO: Send success email for password reset
-    await transporter.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Password reset successfully",
-      html: passwordResetSuccessEmail(user.fullname),
-    });
+    await sendPasswordResetSuccessEmail(user.email, user.fullname);
 
     res.status(200).json({
       success: true,
@@ -270,7 +246,7 @@ export const getProfile = async (req: Request, res: Response) => {
     const { id } = req.user;
 
     // const SELECT = "-isActive -password -verificationToken -verificationTokenExpiresAt";
-    const user = await User.findById(id)
+    const user = await User.findOne({ _id: id, isActive: true })
       .select("fullname email address city country profilePicture")
       .exec();
     if (!user) {
@@ -294,9 +270,12 @@ export const getProfile = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const { id } = req.user;
-    const { fullname, email, contact, address, city, country } = req.body;
+    const { fullname, contact, address, city, country } = req.body;
 
-    const user = await User.findOne({ _id: id });
+    const user = await User.findOne({ _id: id, isActive: true })
+      .select("-password")
+      .exec();
+
     if (!user) {
       return res
         .status(404)
@@ -310,22 +289,42 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
 
     user.fullname = fullname || user.fullname;
-    user.email = email || user.email;
     user.contact = contact || user.contact;
     user.address = address || user.address;
     user.city = city || user.city;
     user.country = country || user.country;
     user.profilePicture = profilePictureUrl || user.profilePicture;
-
     await user.save();
-
-    const updatedUser = await User.findById(user._id).select("-password");
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user: updatedUser,
+      user,
     });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ success: false, message: errorMessage });
+  }
+};
+
+export const deleteUserAccount = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+    const user = await User.findOneAndUpdate(
+      { _id: id, isActive: true },
+      { isActive: false },
+    ).exec();
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Account deleted successfully" });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

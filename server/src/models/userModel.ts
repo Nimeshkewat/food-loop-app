@@ -10,6 +10,7 @@ export interface IUser {
   country: string;
   profilePicture: string;
   isAdmin: boolean;
+  isActive: boolean;
   lastLogin?: Date;
   isVerified?: boolean;
   resetPasswordToken?: string;
@@ -61,6 +62,10 @@ const userSchema = new mongoose.Schema<IUserDocument>(
     isAdmin: {
       type: Boolean,
       default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     //* Advanced authentication
     lastLogin: {

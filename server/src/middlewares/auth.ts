@@ -42,7 +42,7 @@ const isAuthenticated = async (
       isAdmin: decoded.isAdmin,
     };
 
-    req.user = user; //* Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+    req.user = user;
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: "Not Authorized" });

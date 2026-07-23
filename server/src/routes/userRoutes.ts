@@ -1,6 +1,7 @@
 import express from "express";
 import {
   checkAuth,
+  deleteUserAccount,
   forgotPassword,
   getProfile,
   login,
@@ -32,5 +33,7 @@ router.patch(
   upload.single("imageFile"),
   updateProfile,
 );
+
+router.patch("/delete-profile", isAuthenticated, deleteUserAccount);
 
 export default router;
