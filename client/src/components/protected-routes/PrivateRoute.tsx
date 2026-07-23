@@ -10,6 +10,7 @@ function PrivateRoute({ children }: { children: ReactNode }) {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
   return children;
 }
 

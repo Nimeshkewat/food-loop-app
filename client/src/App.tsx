@@ -19,6 +19,7 @@ import PrivateRoute from "./components/protected-routes/PrivateRoute";
 import AdminRoute from "./components/protected-routes/AdminRoute";
 import { useAuth } from "./context/AuthProvider";
 import Loader from "./components/ui/Loader";
+import NotFound from "./pages/not-found/NotFound";
 
 function App() {
   const { isLoading } = useAuth();
@@ -27,9 +28,12 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
+        <Route path="*" element={<NotFound />} />
+
         <Route index element={<Home />} />
         <Route path="/search/:searchText" element={<SearchPage />} />
         <Route path="/restaurant/:id" element={<RestaurantDetails />} />
+
         <Route
           path="/profile"
           element={
@@ -117,9 +121,9 @@ function App() {
       <Route
         path="/verify-email"
         element={
-          <PrivateRoute>
+          <PublicRoute>
             <VerifyEmail />
-          </PrivateRoute>
+          </PublicRoute>
         }
       />
     </Routes>

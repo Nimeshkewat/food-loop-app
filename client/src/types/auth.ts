@@ -17,6 +17,12 @@ export interface RegisterResponse {
   message: string;
 }
 
+// Verify Email
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
 // Login
 export interface LoginInputState {
   email: string;

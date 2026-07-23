@@ -1,13 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useVerifyEmail } from "@/hooks/auth/useVerifyEmail";
+import type { ApiError } from "@/types/api";
 import { Loader2 } from "lucide-react";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type SubmitEvent,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function VerifyEmail() {
+  const navigate = useNavigate();
+  const { mutate, isPending } = useVerifyEmail();
+  const [apiError, setApiError] = useState("");
+
   const OTP_LENGTH = 6;
   const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(""));
   const inputRef = useRef<(HTMLInputElement | null)[]>([]);
-  const loading = false;
 
   const handleChange = (index: number, value: string) => {
     //* Only take the last character typed (handles overwriting existing characters)
@@ -65,6 +78,21 @@ function VerifyEmail() {
     }
   };
 
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const verificationCode = otp.join("");
+
+    mutate(verificationCode, {
+      onSuccess: (data) => {
+        toast.success(data?.message);
+        navigate("/login", { replace: true });
+      },
+      onError: (error: ApiError) => {
+        setApiError(error.response?.data?.message || "Failed to verify email");
+      },
+    });
+  };
+
   useEffect(() => {
     inputRef.current[0]?.focus();
   }, []);
@@ -78,7 +106,7 @@ function VerifyEmail() {
             Enter the 6 digit code sent to your email address
           </p>
         </div>
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={handleSubmit}>
           <div className="flex justify-between items-center gap-2">
             {otp.map((_, index) => (
               <Input
@@ -87,6 +115,7 @@ function VerifyEmail() {
                 ref={(element) => {
                   inputRef.current[index] = element;
                 }}
+                required
                 value={otp[index]}
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
@@ -95,8 +124,13 @@ function VerifyEmail() {
               />
             ))}
           </div>
-          <Button disabled={loading} type="submit" className="w-full mt-4">
-            {loading ? <Loader2 className="animate-spin" /> : "Verify"}
+          {apiError && (
+            <div className="p-3 mb-4 mt-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+              {apiError}
+            </div>
+          )}
+          <Button disabled={isPending} type="submit" className="w-full mt-4">
+            {isPending ? <Loader2 className="animate-spin" /> : "Verify"}
           </Button>
         </form>
       </div>

@@ -54,7 +54,7 @@ function Register() {
       onSuccess: async (data) => {
         setInput({ fullname: "", email: "", password: "", contact: "" });
         toast.success(data?.message);
-        navigate("/login");
+        navigate("/verify-email");
         await queryClient.invalidateQueries({ queryKey: ["authUser"] });
       },
       onError: (error: any) => {

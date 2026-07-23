@@ -7,6 +7,7 @@ interface AuthContextTypes {
   isAdmin: boolean;
   isError: boolean;
   error: Error | null;
+  isVerified: boolean;
 }
 
 const AuthContext = createContext<AuthContextTypes | undefined>(undefined);
@@ -15,6 +16,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const { data, isLoading, isError, error } = useCheckAuth();
   const isAuthenticated = !isError && data?.user ? true : false;
   const isAdmin = !isError && data?.user?.isAdmin ? true : false;
+  const isVerified = data?.user?.isVerified ? true : false;
 
   if (isError) {
     console.log(error.response?.data.message || error?.message);
@@ -25,6 +27,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin,
     isError,
     error,
+    isVerified,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

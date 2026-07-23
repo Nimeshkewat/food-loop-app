@@ -25,20 +25,22 @@ export const createRestaurant = async (req: Request, res: Response) => {
     const result = await uploadToCloudinary(req);
     const imageUrl = result.secure_url;
 
-    const newRestaurant = await Restaurant.create({
+    await Restaurant.create({
       user: id,
       restaurantName,
       city,
       country,
-      deliveryTime,
+      deliveryTime: Number(deliveryTime),
       cuisines: JSON.parse(cuisines),
       imageUrl,
     });
 
+    const updatedRestaurant = await Restaurant.findOne({ user: id }).exec();
+
     res.status(201).json({
       success: true,
       message: "Restaurant created successfully",
-      data: newRestaurant,
+      restaurant: updatedRestaurant,
     });
   } catch (error) {
     const errorMessage =
