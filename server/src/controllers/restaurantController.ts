@@ -60,7 +60,7 @@ export const getRestaurant = async (req: Request, res: Response) => {
         .json({ success: false, message: "Restaurant not found" });
     }
 
-    res.status(200).json({ success: true, data: restaurant });
+    res.status(200).json({ success: true, restaurant });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -99,7 +99,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Restaurant updated successfully",
-      data: restaurant,
+      restaurant,
     });
   } catch (error) {
     const errorMessage =
@@ -122,7 +122,7 @@ export const getRestaurantOrders = async (req: Request, res: Response) => {
       .populate("user restaurant")
       .exec();
 
-    res.status(200).json({ success: true, data: orders || [] });
+    res.status(200).json({ success: true, orders });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -149,7 +149,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Order status updated", data: order });
+      .json({ success: true, message: "Order status updated", order });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -178,6 +178,7 @@ export const deleteRestaurant = async (req: Request, res: Response) => {
   }
 };
 
+//*
 export const getRestaurantWithFilters = async (req: Request, res: Response) => {
   try {
     const { searchText } = req.params;
@@ -210,7 +211,7 @@ export const getRestaurantWithFilters = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .exec();
 
-    res.status(200).json({ success: true, data: restaurants });
+    res.status(200).json({ success: true, restaurants });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -232,7 +233,7 @@ export const getSingleRestaurant = async (req: Request, res: Response) => {
         .json({ success: false, message: "Restaurant not found" });
     }
 
-    res.status(200).json({ success: true, data: restaurant });
+    res.status(200).json({ success: true, restaurant });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
