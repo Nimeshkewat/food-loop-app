@@ -9,6 +9,14 @@ export const addMenu = async (req: Request, res: Response) => {
     const { id } = req.user;
     const { name, description, price } = req.body;
 
+    const existingRestaurant = await Restaurant.findOne({ user: id }).exec();
+    if (!existingRestaurant) {
+      return res.status(404).json({
+        success: false,
+        message: "You must create a restaurant before adding menu items",
+      });
+    }
+
     const result = await uploadToCloudinary(req);
     const imageUrl = result.secure_url;
 
@@ -38,8 +46,17 @@ export const addMenu = async (req: Request, res: Response) => {
 
 export const editMenu = async (req: Request, res: Response) => {
   try {
+    const { id } = req.user;
     const { menuId } = req.params;
     const { name, description, price } = req.body;
+
+    const existingRestaurant = await Restaurant.findOne({ user: id }).exec();
+    if (!existingRestaurant) {
+      return res.status(404).json({
+        success: false,
+        message: "You must create a restaurant before adding menu items",
+      });
+    }
 
     const result = await uploadToCloudinary(req);
     const imageUrl = result.secure_url;
@@ -69,7 +86,16 @@ export const editMenu = async (req: Request, res: Response) => {
 
 export const deleteMenu = async (req: Request, res: Response) => {
   try {
+    const { id } = req.user;
     const { menuId } = req.params;
+
+    const existingRestaurant = await Restaurant.findOne({ user: id }).exec();
+    if (!existingRestaurant) {
+      return res.status(404).json({
+        success: false,
+        message: "You must create a restaurant before adding menu items",
+      });
+    }
 
     const menu = await Menu.findByIdAndDelete(menuId).exec();
     if (!menu) {

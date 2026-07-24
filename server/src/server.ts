@@ -10,6 +10,8 @@ import userRouter from "./routes/userRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
 import menuRouter from "./routes/menuRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
+import cartRouter from "./routes/cartRoutes.js";
+
 import { webhook } from "./controllers/orderController.js";
 
 //* App instance and Port
@@ -40,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/restaurant", restaurantRouter);
 app.use("/api/v1/menu", menuRouter);
+app.use("/api/v1/cart", cartRouter);
 app.post("/api/order", orderRouter);
 
 app.listen(PORT, () => {

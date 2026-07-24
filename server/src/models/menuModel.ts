@@ -1,19 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-export interface IMenu {
+interface IMenu {
+  restaurant: mongoose.Schema.Types.ObjectId;
   name: string;
   description: string;
   price: number;
   image: string;
 }
 
-export interface IMenuDocument extends IMenu, Document {
+interface IMenuDocument extends IMenu, Document {
   createdAt: Date;
   updatedAt: Date;
 }
 
 const menuSchema = new mongoose.Schema<IMenuDocument>(
   {
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "restaurant",
+      required: true,
+    },
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },

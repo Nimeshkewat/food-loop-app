@@ -17,8 +17,8 @@ router.post("/", isAuthenticated, upload.single("imageFile"), createRestaurant);
 router.get("/", isAuthenticated, getRestaurant);
 router.put("/", isAuthenticated, upload.single("imageFile"), updateRestaurant);
 
-router.get("/order", isAuthenticated, getRestaurantOrders);
-router.patch("/order/:orderId/status", isAuthenticated, updateOrderStatus);
+router.get("/orders", isAuthenticated, getRestaurantOrders);
+router.patch("/orders/:orderId/status", isAuthenticated, updateOrderStatus);
 router.get("/search/:searchText", getRestaurantWithFilters);
 router.get("/:restaurantId", getSingleRestaurant);
 
