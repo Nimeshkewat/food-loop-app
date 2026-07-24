@@ -1,11 +1,11 @@
 import api from "@/axios";
 import type { ApiError } from "@/types/api";
-import type { CreateRestaurantResponse } from "@/types/restaurant";
+import type { RestaurantResponse } from "@/types/restaurant";
 import { useMutation } from "@tanstack/react-query";
 
 const createRestaurant = async (
   formData: FormData,
-): Promise<CreateRestaurantResponse> => {
+): Promise<RestaurantResponse> => {
   const response = await api.post("/restaurant", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -13,7 +13,7 @@ const createRestaurant = async (
 };
 
 export const useCreateRestaurant = () => {
-  return useMutation<CreateRestaurantResponse, ApiError, FormData>({
+  return useMutation<RestaurantResponse, ApiError, FormData>({
     mutationFn: createRestaurant,
   });
 };

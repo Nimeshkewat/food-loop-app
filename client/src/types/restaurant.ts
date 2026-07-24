@@ -12,7 +12,7 @@ export interface Restaurant {
   updatedAt: string;
 }
 
-export interface CreateRestaurantInputState {
+export interface RestaurantInputState {
   restaurantName: string;
   city: string;
   country: string;
@@ -20,7 +20,7 @@ export interface CreateRestaurantInputState {
   cuisines: string[];
 }
 
-export interface CreateRestaurantResponse {
+export interface RestaurantResponse {
   success: boolean;
   message: string;
   restaurant: Restaurant;

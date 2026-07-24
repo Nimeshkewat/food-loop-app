@@ -9,7 +9,7 @@ const logout = async () => {
 };
 
 export const useLogout = () => {
-  return useMutation<LogoutResponse, ApiError, void>({
+  return useMutation<LogoutResponse, ApiError, null>({
     mutationFn: logout,
   });
 };

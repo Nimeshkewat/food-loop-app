@@ -2,34 +2,46 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { restaurantFormSchema } from "@/schema/restaurantSchema";
-import type { CreateRestaurantInputState } from "@/types/restaurant";
-import { useCreateRestaurant } from "../../hooks/admin/useCreateRestaurant";
+import type { RestaurantInputState } from "@/types/restaurant";
+import { useCreateRestaurant } from "../../hooks/admin/restaurant/useCreateRestaurant";
 import { Loader2 } from "lucide-react";
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type SubmitEvent } from "react";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetRestaurant } from "@/hooks/admin/restaurant/useGetRestaurant";
+import Loader from "@/components/ui/Loader";
+import { useUpdateRestaurant } from "@/hooks/admin/restaurant/useUpdateRestaurnat";
+import type { ApiError } from "@/types/api";
 
 function Restaurant() {
-  const { mutate, isPending } = useCreateRestaurant();
+  const { mutate: createRestaurant, isPending: isCreating } =
+    useCreateRestaurant();
+
+  const { mutate: updateRestaurant, isPending: isUpdating } =
+    useUpdateRestaurant();
+
+  const { data, isLoading } = useGetRestaurant();
   const queryClient = useQueryClient();
 
   // TODO: derive from a useMyRestaurant query later
-  const [restaurantAlreadyExist, setRestaurantAlreadyExist] = useState(false);
+  const restaurantAlreadyExist = data?.restaurant ? true : false;
 
-  const [input, setInput] = useState<CreateRestaurantInputState>({
+  const [input, setInput] = useState<RestaurantInputState>({
     restaurantName: "",
     city: "",
     country: "",
     deliveryTime: 0,
     cuisines: [],
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | string>(
+    data?.restaurant?.imageUrl || "",
+  );
   const [imageError, setImageError] = useState("");
   const [apiError, setApiError] = useState("");
 
   const [inputErrors, setInputErrors] = useState<
-    Partial<Record<keyof CreateRestaurantInputState, string>>
+    Partial<Record<keyof RestaurantInputState, string>>
   >({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +77,7 @@ function Restaurant() {
       return;
     }
 
-    if (!imageFile) {
+    if (!restaurantAlreadyExist && !imageFile) {
       setImageError("Restaurant banner image is required");
       return;
     }
@@ -79,13 +91,27 @@ function Restaurant() {
     formData.append("country", input.country);
     formData.append("deliveryTime", input.deliveryTime.toString());
     formData.append("cuisines", JSON.stringify(input.cuisines));
-    formData.append("imageFile", imageFile);
+    if (imageFile) formData.append("imageFile", imageFile);
 
-    mutate(formData, {
+    if (restaurantAlreadyExist) {
+      updateRestaurant(formData, {
+        onSuccess: (data) => {
+          console.log(data);
+          toast.success(data.message);
+          queryClient.invalidateQueries({ queryKey: ["fetchRestaurant"] });
+        },
+        onError: (error: ApiError) => {
+          setApiError(error?.response?.data?.message || "Failed to update");
+        },
+      });
+      console.log("eary return");
+      return;
+    }
+
+    createRestaurant(formData, {
       onSuccess: async (data) => {
         toast.success(data.message);
         await queryClient.invalidateQueries({ queryKey: ["fetchRestaurant"] });
-        setRestaurantAlreadyExist(true);
       },
       onError: (error) => {
         setApiError(
@@ -95,11 +121,28 @@ function Restaurant() {
     });
   };
 
-  console.log(restaurantAlreadyExist);
+  useEffect(() => {
+    if (data) {
+      setInput({
+        restaurantName: data?.restaurant?.restaurantName || "",
+        city: data?.restaurant?.city || "",
+        country: data?.restaurant?.country || "",
+        deliveryTime: data?.restaurant?.deliveryTime || 0,
+        cuisines: data?.restaurant?.cuisines || [],
+      });
+    }
+  }, [data]);
+
+  if (isLoading) return <Loader />;
+
   return (
     <div className="max-w-6xl mx-auto my-10">
       <div>
-        <h1 className="font-extrabold text-2xl mb-5">Add Restaurants</h1>
+        <h1 className="font-extrabold text-2xl mb-5">
+          {data?.restaurant
+            ? "Update Your Restaurant"
+            : "Create Your Restaurant"}
+        </h1>
       </div>
 
       {apiError && (
@@ -212,15 +255,23 @@ function Restaurant() {
         </div>
 
         <div className="my-6">
-          <Button type="submit" disabled={isPending}>
-            {isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : restaurantAlreadyExist ? (
-              "Update Your Restaurant"
-            ) : (
-              "Add Your Restaurant"
-            )}
-          </Button>
+          {restaurantAlreadyExist ? (
+            <Button type="submit" disabled={isUpdating}>
+              {isUpdating ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Update Your Restaurant"
+              )}
+            </Button>
+          ) : (
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Add Your Restaurant"
+              )}
+            </Button>
+          )}
         </div>
       </form>
     </div>
