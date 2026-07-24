@@ -34,12 +34,19 @@ function Restaurant() {
     deliveryTime: 0,
     cuisines: [],
   });
-  const [imageFile, setImageFile] = useState<File | string>(
-    data?.restaurant?.imageUrl || "",
-  );
-  const [imageError, setImageError] = useState("");
-  const [apiError, setApiError] = useState("");
+  // snapshot of last-saved values, used to detect real changes
+  const [originalData, setOriginalData] = useState<RestaurantInputState>({
+    restaurantName: "",
+    city: "",
+    country: "",
+    deliveryTime: 0,
+    cuisines: [],
+  });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState("");
+
+  const [apiError, setApiError] = useState("");
   const [inputErrors, setInputErrors] = useState<
     Partial<Record<keyof RestaurantInputState, string>>
   >({});
@@ -59,6 +66,14 @@ function Restaurant() {
       setImageError("");
     }
   };
+
+  const hasChanges =
+    input.restaurantName !== originalData.restaurantName ||
+    input.city !== originalData.city ||
+    input.country !== originalData.country ||
+    input.deliveryTime !== originalData.deliveryTime ||
+    input.cuisines !== originalData.cuisines ||
+    imageFile !== null;
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,7 +119,6 @@ function Restaurant() {
           setApiError(error?.response?.data?.message || "Failed to update");
         },
       });
-      console.log("eary return");
       return;
     }
 
@@ -123,13 +137,15 @@ function Restaurant() {
 
   useEffect(() => {
     if (data) {
-      setInput({
+      const fetched: RestaurantInputState = {
         restaurantName: data?.restaurant?.restaurantName || "",
         city: data?.restaurant?.city || "",
         country: data?.restaurant?.country || "",
         deliveryTime: data?.restaurant?.deliveryTime || 0,
         cuisines: data?.restaurant?.cuisines || [],
-      });
+      };
+      setInput(fetched);
+      setOriginalData(fetched);
     }
   }, [data]);
 
@@ -256,7 +272,7 @@ function Restaurant() {
 
         <div className="my-6">
           {restaurantAlreadyExist ? (
-            <Button type="submit" disabled={isUpdating}>
+            <Button type="submit" disabled={isUpdating || !hasChanges}>
               {isUpdating ? (
                 <Loader2 className="animate-spin" />
               ) : (
