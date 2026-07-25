@@ -21,10 +21,12 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetMenus } from "@/hooks/admin/menu/useGetMenus";
 import Loader from "@/components/ui/Loader";
+import { useDeleteMenu } from "@/hooks/admin/menu/useDeleteMenu";
 
 function AddMenu() {
   const { data, isLoading } = useGetMenus();
-  const { mutate, isPending } = useAddMenu();
+  const { mutate: addMenu, isPending: isAdding } = useAddMenu();
+  const { mutate: deleteMenu, isPending: isDeleting } = useDeleteMenu();
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
@@ -82,7 +84,7 @@ function AddMenu() {
     formData.append("price", input.price);
     if (imageFile) formData.append("imageFile", imageFile);
 
-    mutate(formData, {
+    addMenu(formData, {
       onSuccess: async (data) => {
         toast.success(data.message);
         setInput({ name: "", description: "", price: "" });
@@ -96,11 +98,24 @@ function AddMenu() {
     });
   };
 
+  const handleMenuDelete = (menuId: string) => {
+    deleteMenu(menuId, {
+      onSuccess: async (data) => {
+        console.log(data);
+        toast.success(data.message);
+        await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });
+      },
+      onError: (error) => {
+        setApiError(error?.response?.data?.message || "Failed to delete menu");
+      },
+    });
+  };
+
   if (isLoading) return <Loader />;
 
   return (
     <div className="max-w-6xl mx-auto my-10">
-      <div className="flex justify-between">
+      <div className="flex justify-between px-4">
         <h1 className="font-bold md:font-extrabold text-lg md:text-2xl">
           Available Menus
         </h1>
@@ -174,8 +189,8 @@ function AddMenu() {
                 )}
               </div>
               <DialogFooter>
-                <Button disabled={isPending} type="submit" className="w-full">
-                  {isPending ? <Loader2 className="animate-spin" /> : "Add"}
+                <Button disabled={isAdding} type="submit" className="w-full">
+                  {isAdding ? <Loader2 className="animate-spin" /> : "Add"}
                 </Button>
               </DialogFooter>
             </form>
@@ -202,14 +217,23 @@ function AddMenu() {
                   Price: <span className="text-primary">{menu.price}</span>
                 </h2>
               </div>
-              <Button
-                onClick={() => {
-                  setSelectedMenu(menu);
-                  setEditOpen(true);
-                }}
-              >
-                Edit
-              </Button>
+              <div className="flex flex-col md:w-30 w-full gap-2">
+                <Button
+                  onClick={() => {
+                    setSelectedMenu(menu);
+                    setEditOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  disabled={isDeleting}
+                  onClick={() => handleMenuDelete(menu._id)}
+                  className="bg-red-500 border-red-100 hover:bg-red-400 cursor-pointer"
+                >
+                  {isDeleting ? <Loader2 className="animate-spin" /> : "Remove"}
+                </Button>
+              </div>
             </div>
           </div>
         ))}

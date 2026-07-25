@@ -38,7 +38,6 @@ function EditMenu({
   editOpen,
   setEditOpen,
 }: EditMenuProps) {
-  console.log(selectedMenu);
   const { mutate, isPending } = useUpdateMenu();
   const queryClient = useQueryClient();
 
