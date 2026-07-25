@@ -3,6 +3,7 @@ import {
   addMenu,
   deleteMenu,
   editMenu,
+  getMenus,
 } from "../controllers/menuController.js";
 import isAuthenticated from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
@@ -17,5 +18,6 @@ router.patch(
   editMenu,
 );
 router.delete("/:menuId/delete", isAuthenticated, deleteMenu);
+router.get("/", isAuthenticated, getMenus);
 
 export default router;

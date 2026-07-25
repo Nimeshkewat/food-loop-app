@@ -7,18 +7,16 @@ export const addToCart = async (req: Request, res: Response) => {
     const { id: userId } = req.user;
     const { menuId, quantity } = req.body;
 
-    const menu = await Menu.findById(menuId);
+    const menu = await Menu.findById(menuId).exec();
     if (!menu) {
-      return res.status(404).json({
-        success: false,
-        message: "Menu item not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Menu item not found" });
     }
 
     const qty = Number(quantity) > 0 ? Number(quantity) : 1;
-    let cart = await Cart.findOne({ user: userId });
+    let cart = await Cart.findOne({ user: userId }).exec();
 
-    //* no cart yet — create a fresh one for this restaurant
     if (!cart) {
       cart = await Cart.create({
         user: userId,
@@ -33,26 +31,23 @@ export const addToCart = async (req: Request, res: Response) => {
           },
         ],
       });
-
-      return res.status(201).json({
-        success: true,
-        message: "Item added to cart",
-        cart,
-      });
+      return res
+        .status(201)
+        .json({ success: true, message: "Item added to cart", cart });
     }
 
-    //* cart exists but belongs to a different restaurant
+    // cart exists but belongs to a different restaurant
     if (!cart.restaurant.equals(menu.restaurant)) {
-      return res.status(409).json({
+      return res.status(400).json({
         success: false,
         message:
-          "Your cart contains items from another restaurant. Please clear your cart to order from here.",
+          "Your cart contains item from another restaurant. Please clear your cart to order from here",
       });
     }
 
-    //* same restaurant — check if item already exists in cart
-    const existingItem = cart.items.find((item: any) =>
-      item.menuId.equals(menu._id),
+    //same restaurant — check if item already exists in cart
+    const existingItem = cart.items.find(
+      (item: any) => item.menuId === menu._id,
     );
 
     if (existingItem) {
@@ -66,14 +61,11 @@ export const addToCart = async (req: Request, res: Response) => {
         quantity: qty,
       });
     }
-
     await cart.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Item added to cart",
-      cart,
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Item added to cart", cart });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
@@ -81,38 +73,102 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCart = async (req: Request, res: Response) => {
+export const updateCartQuantity = async (req: Request, res: Response) => {
   try {
+    const { id: userId } = req.user;
+    const { quantity } = req.body;
+    const { menuId } = req.params;
+
+    if (!quantity) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Quantity is required" });
+    }
+
+    const cart = await Cart.findOne({ user: userId }).exec();
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
+    }
+
+    const item = cart.items.find((item: any) => item.menuId.equals(menuId));
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Item not found in cart" });
+    }
+
+    item.quantity = Number(quantity);
+    await cart.save();
+
+    res.status(200).json({ success: true, message: "Cart item updated", cart });
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "An unknwon error occurred";
+      error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errorMessage });
   }
 };
 
-export const deleteCart = async (req: Request, res: Response) => {
+export const deleteItemFromCart = async (req: Request, res: Response) => {
   try {
+    const { id: userId } = req.user;
+    const { menuId } = req.params;
+
+    const cart = await Cart.findOne({ user: userId }).exec();
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
+    }
+
+    cart.items = cart.items.filter((item: any) => item.menuId.equals(menuId));
+    await cart.save();
+
+    res.status(200).json({ success: true, message: "Cart item deleted", cart });
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "An unknwon error occurred";
+      error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errorMessage });
   }
 };
 
 export const clearCart = async (req: Request, res: Response) => {
   try {
+    const { id: userId } = req.user;
+
+    const cart = await Cart.findOne({ user: userId }).exec();
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
+    }
+
+    cart.items = [];
+    await cart.save();
+
+    res.status(200).json({ success: true, message: "Cart cleared", cart });
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "An unknwon error occurred";
+      error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errorMessage });
   }
 };
 
 export const getCart = async (req: Request, res: Response) => {
   try {
+    const { id: userId } = req.user;
+    const cart = await Cart.findOne({ user: userId }).exec();
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
+    }
+
+    res.status(200).json({ success: true, cart });
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "An unknwon error occurred";
+      error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errorMessage });
   }
 };

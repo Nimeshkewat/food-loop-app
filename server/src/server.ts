@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/restaurant", restaurantRouter);
-app.use("/api/v1/menu", menuRouter);
+app.use("/api/v1/menus", menuRouter);
 app.use("/api/v1/cart", cartRouter);
 app.post("/api/order", orderRouter);
 
