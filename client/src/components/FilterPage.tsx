@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 
-export type FilterOptionsState = {
+type FilterOptionsState = {
   id: string;
   label: string;
 };
@@ -14,23 +14,34 @@ const filterOptions: FilterOptionsState[] = [
   { id: "momos", label: "Momos" },
 ];
 
-const handleAppliedFilter = (label: string) => {
-  console.log(label);
-};
+interface FilterPageProps {
+  selectedCuisines: string[];
+  toggleCuisine: (label: string) => void;
+  resetFilters: () => void;
+}
 
-function FilterPage() {
+function FilterPage({
+  selectedCuisines,
+  toggleCuisine,
+  resetFilters,
+}: FilterPageProps) {
   return (
     <div className="md:w-72">
       <div className="flex items-center justify-between">
         <h1 className="font-medium text-lg">Filter by cuisines</h1>
-        <Button variant="link" className="cursor-pointer">
+        <Button
+          onClick={resetFilters}
+          variant="link"
+          className="cursor-pointer"
+        >
           Reset
         </Button>
       </div>
       {filterOptions.map((option) => (
         <div key={option.id} className="flex items-center space-x-2 my-5">
           <Checkbox
-            onClick={() => handleAppliedFilter(option.label)}
+            checked={selectedCuisines.includes(option.label)}
+            onCheckedChange={() => toggleCuisine(option.label)}
             id={option.id}
           />
           <Label className="text-sm font-medium leading-none">

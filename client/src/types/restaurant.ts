@@ -28,6 +28,12 @@ export interface RestaurantResponse {
   restaurant: Restaurant;
 }
 
+// Search Restaurant Respones
+export interface SearchRestaurantResponse {
+  success: boolean;
+  restaurants: Restaurant[];
+}
+
 // Restaurant Orders
 export interface Order {
   _id: string;

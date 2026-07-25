@@ -4,7 +4,7 @@ import type { RestaurantResponse } from "@/types/restaurant";
 import { useQuery } from "@tanstack/react-query";
 
 const getRestaurant = async () => {
-  const response = await api.get("/restaurant");
+  const response = await api.get("/restaurants");
   return response.data;
 };
 

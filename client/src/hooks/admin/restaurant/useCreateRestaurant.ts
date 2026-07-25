@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 const createRestaurant = async (
   formData: FormData,
 ): Promise<RestaurantResponse> => {
-  const response = await api.post("/restaurant", formData, {
+  const response = await api.post("/restaurants", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return response.data;

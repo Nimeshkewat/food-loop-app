@@ -5,7 +5,7 @@ import pizzaImg from "@/assets/pizza.jpg";
 function MenuList() {
   return (
     <div className="md:p-4">
-      <h1 className="text-xl md:text-2xl font-bold mb-6">Available Menu</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-6">Available Menus</h1>
       <div className="grid md:grid-cols-3 space-y-4 md:space-y-0">
         <Card className="md:max-w-md w-full mx-auto shadow-lg rounded-lg overflow-hidden">
           <img
