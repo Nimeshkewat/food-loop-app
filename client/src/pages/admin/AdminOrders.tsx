@@ -1,4 +1,5 @@
 import { Label } from "@/components/ui/label";
+import Loader from "@/components/ui/Loader";
 import {
   Select,
   SelectContent,
@@ -7,16 +8,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetRestaurantOrders } from "@/hooks/admin/restaurant/useGetRestaurantOrders";
 
 function AdminOrders() {
-  return (
+  const { data, isLoading } = useGetRestaurantOrders();
+
+  console.log(data);
+
+  if (isLoading) return <Loader />;
+
+  return data?.orders.length === 0 ? (
+    <div>No Orders Found</div>
+  ) : (
     <div className="max-w-6xl mx-auto py-10 px-6">
       <h1 className="mb-10 text-3xl font-extrabold text-gray-900 dark:text-white">
         Orders Overview
       </h1>
       <div className="space-y-8">
         {/* restaurant orders */}
-        {[1, 2, 3].map((_, index: number) => (
+        {data?.orders.map((_, index: number) => (
           <div
             key={index}
             className="flex flex-col md:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700"

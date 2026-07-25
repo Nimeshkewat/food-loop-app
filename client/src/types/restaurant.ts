@@ -1,3 +1,5 @@
+import type { User } from "./user";
+
 export interface Restaurant {
   _id: string;
   user: string;
@@ -24,4 +26,44 @@ export interface RestaurantResponse {
   success: boolean;
   message: string;
   restaurant: Restaurant;
+}
+
+// Restaurant Orders
+export interface Order {
+  _id: string;
+  user: User;
+  restaurant: Restaurant;
+  deliveryDetails: {
+    name: string;
+    email: string;
+    address: string;
+    city: string;
+  };
+  cartItems: [
+    {
+      menuId: string;
+      name: string;
+      image: string;
+      price: number;
+      quantity: number;
+    },
+  ];
+  totalAmount: string;
+  status:
+    | "pending"
+    | "confirmed"
+    | "preparing"
+    | "outfordelivery"
+    | "delivered";
+
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  paymentStatus: "unpaid" | "paid" | "failed";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RestaurantOrdersResponse {
+  success: boolean;
+  orders: Order[];
 }

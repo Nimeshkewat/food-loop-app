@@ -12,42 +12,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Plus } from "lucide-react";
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
-import pizzaImg from "@/assets/pizza.jpg";
 import EditMenu from "@/components/admin/EditMenu";
-import { menuSchema, type MenuFormSchema } from "@/schema/menuSchema";
+import { menuSchema } from "@/schema/menuSchema";
 import * as z from "zod";
-
-const menus = [
-  {
-    name: "Food",
-    description: "Food description",
-    price: "Price",
-    image: pizzaImg,
-  },
-  {
-    name: "Food 2",
-    description: "Food description 2",
-    price: "Price 2",
-    image: pizzaImg,
-  },
-];
+import type { Menu, MenuInputState } from "@/types/menu";
+import { useAddMenu } from "@/hooks/admin/menu/useAddMenu";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetMenus } from "@/hooks/admin/menu/useGetMenus";
+import Loader from "@/components/ui/Loader";
 
 function AddMenu() {
+  const { data, isLoading } = useGetMenus();
+  const { mutate, isPending } = useAddMenu();
+  const queryClient = useQueryClient();
+
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState<any>();
-  const loading = false;
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
-  const [input, setInput] = useState<MenuFormSchema>({
+  const [input, setInput] = useState<MenuInputState>({
     name: "",
     description: "",
     price: "",
-    image: undefined,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const [inputErrors, setInputErrors] = useState<
-    Partial<Record<keyof MenuFormSchema, string[]>>
-  >({});
+  const [inputErrors, setInputErrors] = useState<Partial<MenuInputState>>({});
+  const [apiError, setApiError] = useState("");
+  const [imageError, setImageError] = useState("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,7 +49,10 @@ function AddMenu() {
 
   const handleFileCahnge = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    setInput((prev) => ({ ...prev, imageFile: file }));
+    if (file) {
+      setImageFile(file);
+      setImageError("");
+    }
   };
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
@@ -64,13 +60,43 @@ function AddMenu() {
     const result = menuSchema.safeParse(input);
     if (!result.success) {
       const { fieldErrors } = z.flattenError(result.error);
-      setInputErrors(fieldErrors);
+      setInputErrors({
+        name: fieldErrors.name?.[0],
+        description: fieldErrors.description?.[0],
+        price: fieldErrors.price?.[0],
+      });
+      return;
+    }
+
+    if (!imageFile) {
+      setImageError("Menu image is requied");
       return;
     }
     setInputErrors({});
+    setApiError("");
 
     //* api
+    const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("description", input.description);
+    formData.append("price", input.price);
+    if (imageFile) formData.append("imageFile", imageFile);
+
+    mutate(formData, {
+      onSuccess: async (data) => {
+        toast.success(data.message);
+        setInput({ name: "", description: "", price: "" });
+        setImageFile(null);
+        setOpen(false);
+        await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });
+      },
+      onError: (error) => {
+        setApiError(error?.response?.data?.message || "failed to add menu");
+      },
+    });
   };
+
+  if (isLoading) return <Loader />;
 
   return (
     <div className="max-w-6xl mx-auto my-10">
@@ -85,6 +111,11 @@ function AddMenu() {
           <DialogContent>
             <DialogHeader className="flex items-center justify-center">
               <DialogTitle>Add a new menu</DialogTitle>
+              {apiError && (
+                <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+                  {apiError}
+                </div>
+              )}
               <DialogDescription className="text-center">
                 Create a menu that will make your restaurant stand out.
               </DialogDescription>
@@ -101,7 +132,7 @@ function AddMenu() {
                 />
                 {inputErrors.name && (
                   <p className="text-red-500 text-xs mt-1 pl-1 block">
-                    {inputErrors.name?.[0]}
+                    {inputErrors.name}
                   </p>
                 )}
               </div>
@@ -116,7 +147,7 @@ function AddMenu() {
                 />
                 {inputErrors.description && (
                   <p className="text-red-500 text-xs mt-1 pl-1 block">
-                    {inputErrors.description?.[0]}
+                    {inputErrors.description}
                   </p>
                 )}
               </div>
@@ -131,57 +162,65 @@ function AddMenu() {
                 />
                 {inputErrors.price && (
                   <p className="text-red-500 text-xs mt-1 pl-1 block">
-                    {inputErrors.price?.[0]}
+                    {inputErrors.price}
                   </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label>Upload Menu Image</Label>
                 <Input type="file" onChange={handleFileCahnge} name="image" />
+                {imageError && (
+                  <p className="text-red-500 text-xs mt-1">{imageError}</p>
+                )}
               </div>
               <DialogFooter>
-                <Button disabled={loading} type="submit" className="w-full">
-                  {loading ? <Loader2 className="animate-spin" /> : "Add"}
+                <Button disabled={isPending} type="submit" className="w-full">
+                  {isPending ? <Loader2 className="animate-spin" /> : "Add"}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
+
       {/* render menus */}
-      {menus.map((menu: any, index: number) => (
-        <div key={index} className="mt-6 space-y-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:space-y-4 md:p-4 p-2 shadow-md rounded-lg">
-            <img
-              src={menu.image}
-              alt=""
-              className="md:h-24 md:w-24 h-16 object-cover rounded-lg w-full"
-            />
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold text-gray-800">
-                {menu.name}
-              </h1>
-              <p className="text-sm mt-1 text-gray-600">{menu.description}</p>
-              <h2 className="text-md font-semibold mt-2">
-                Price: <span className="text-primary">{menu.price}</span>
-              </h2>
+      {data &&
+        data?.menus.map((menu: Menu) => (
+          <div key={menu._id} className="mt-6 space-y-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:space-y-4 md:p-4 p-2 shadow-md rounded-lg">
+              <img
+                src={menu.image}
+                alt=""
+                className="md:h-24 md:w-24 h-16 object-cover rounded-lg w-full"
+              />
+              <div className="flex-1">
+                <h1 className="text-lg font-semibold text-gray-800">
+                  {menu.name}
+                </h1>
+                <p className="text-sm mt-1 text-gray-600">{menu.description}</p>
+                <h2 className="text-md font-semibold mt-2">
+                  Price: <span className="text-primary">{menu.price}</span>
+                </h2>
+              </div>
+              <Button
+                onClick={() => {
+                  setSelectedMenu(menu);
+                  setEditOpen(true);
+                }}
+              >
+                Edit
+              </Button>
             </div>
-            <Button
-              onClick={() => {
-                setSelectedMenu(menu);
-                setEditOpen(true);
-              }}
-            >
-              Edit
-            </Button>
-            <EditMenu
-              editOpen={editOpen}
-              setEditOpen={setEditOpen}
-              selectedMenu={selectedMenu}
-            />
           </div>
-        </div>
-      ))}
+        ))}
+      {selectedMenu && (
+        <EditMenu
+          menuId={selectedMenu._id}
+          editOpen={editOpen}
+          setEditOpen={setEditOpen}
+          selectedMenu={selectedMenu}
+        />
+      )}
     </div>
   );
 }
