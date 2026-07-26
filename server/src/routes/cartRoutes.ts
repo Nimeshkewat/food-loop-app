@@ -12,8 +12,8 @@ const router = express.Router();
 
 router.post("/", isAuthenticated, addToCart);
 router.patch("/:menuId", isAuthenticated, updateCartQuantity);
+router.delete("/clear", isAuthenticated, clearCart);
 router.delete("/:menuId", isAuthenticated, deleteItemFromCart);
-router.patch("/clear", isAuthenticated, clearCart);
 router.get("/", isAuthenticated, getCart);
 
 export default router;

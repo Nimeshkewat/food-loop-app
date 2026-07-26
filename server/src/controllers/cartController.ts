@@ -46,9 +46,10 @@ export const addToCart = async (req: Request, res: Response) => {
     }
 
     //same restaurant — check if item already exists in cart
-    const existingItem = cart.items.find(
-      (item: any) => item.menuId === menu._id,
+    const existingItem = cart.items.find((item: any) =>
+      item.menuId.equals(menu._id),
     );
+    console.log(existingItem);
 
     if (existingItem) {
       existingItem.quantity += qty;
@@ -122,7 +123,7 @@ export const deleteItemFromCart = async (req: Request, res: Response) => {
         .json({ success: false, message: "Cart not found" });
     }
 
-    cart.items = cart.items.filter((item: any) => item.menuId.equals(menuId));
+    cart.items = cart.items.filter((item: any) => !item.menuId.equals(menuId));
     await cart.save();
 
     res.status(200).json({ success: true, message: "Cart item deleted", cart });
@@ -137,6 +138,7 @@ export const clearCart = async (req: Request, res: Response) => {
   try {
     const { id: userId } = req.user;
 
+    console.log("server: ", userId);
     const cart = await Cart.findOne({ user: userId }).exec();
     if (!cart) {
       return res
@@ -147,7 +149,7 @@ export const clearCart = async (req: Request, res: Response) => {
     cart.items = [];
     await cart.save();
 
-    res.status(200).json({ success: true, message: "Cart cleared", cart });
+    res.status(200).json({ success: true, message: "Cart cleared" });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
