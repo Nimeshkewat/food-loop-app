@@ -111,6 +111,7 @@ function AddMenu() {
     });
   };
 
+  console.log(data);
   if (isLoading) return <Loader />;
 
   return (
@@ -199,7 +200,7 @@ function AddMenu() {
       </div>
 
       {/* render menus */}
-      {data &&
+      {data ? (
         data?.menus.map((menu: Menu) => (
           <div key={menu._id} className="mt-6 space-y-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:space-y-4 md:p-4 p-2 shadow-md rounded-lg">
@@ -236,7 +237,12 @@ function AddMenu() {
               </div>
             </div>
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="h-70 flex items-center justify-center">
+          <p className="text-2xl font-bold">No menus found</p>
+        </div>
+      )}
       {selectedMenu && (
         <EditMenu
           menuId={selectedMenu._id}
