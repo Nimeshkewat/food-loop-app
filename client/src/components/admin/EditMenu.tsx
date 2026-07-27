@@ -42,12 +42,12 @@ function EditMenu({
   const queryClient = useQueryClient();
 
   const [input, setInput] = useState<MenuInputState>({
-    name: "",
+    fullname: "",
     description: "",
     price: "",
   });
   const [originalData, setOriginalData] = useState<MenuInputState>({
-    name: "",
+    fullname: "",
     description: "",
     price: "",
   });
@@ -80,7 +80,7 @@ function EditMenu({
     if (!result.success) {
       const { fieldErrors } = z.flattenError(result.error);
       setInputErrors({
-        name: fieldErrors.name?.[0],
+        fullname: fieldErrors.name?.[0],
         description: fieldErrors.description?.[0],
         price: fieldErrors.price?.[0],
       });
@@ -102,7 +102,7 @@ function EditMenu({
         onSuccess: async (data) => {
           console.log(data);
           toast.success(data.message);
-          setInput({ name: "", description: "", price: "" });
+          setInput({ fullname: "", description: "", price: "" });
           await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });
           setEditOpen(false);
         },

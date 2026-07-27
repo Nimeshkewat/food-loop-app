@@ -21,6 +21,7 @@ function Profile() {
     fullname: "",
     email: "",
     address: "",
+    contact: 0,
     city: "",
     country: "",
     profilePicture: "",
@@ -31,6 +32,7 @@ function Profile() {
     fullname: "",
     email: "",
     address: "",
+    contact: 0,
     city: "",
     country: "",
     profilePicture: "",
@@ -48,6 +50,7 @@ function Profile() {
         email: data?.user?.email || "",
         city: data?.user?.city || "",
         country: data?.user?.country || "",
+        contact: data?.user?.contact || 0,
         address: data?.user?.address || "",
         profilePicture: data?.user?.profilePicture || "",
       };
@@ -171,6 +174,24 @@ function Profile() {
                 type="email"
                 name="email"
                 value={profileData.email}
+                readOnly
+                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-gray-200">
+          <CardContent className="flex items-center gap-4 p-4">
+            <Mail className="text-gray-400 w-6 h-6 shrink-0" />
+            <div className="w-full">
+              <Label className="text-xs text-gray-400 font-semibold uppercase">
+                Contact
+              </Label>
+              <Input
+                type="number"
+                name="contact"
+                value={profileData.contact}
                 readOnly
                 className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />

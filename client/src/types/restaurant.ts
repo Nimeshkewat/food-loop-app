@@ -1,3 +1,4 @@
+import type { Menu } from "./menu";
 import type { User } from "./user";
 
 export interface Restaurant {
@@ -9,7 +10,7 @@ export interface Restaurant {
   deliveryTime: number;
   cuisines: string[];
   imageUrl: string;
-  menus: string[];
+  menus: Menu[];
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +33,12 @@ export interface RestaurantResponse {
 export interface SearchRestaurantResponse {
   success: boolean;
   restaurants: Restaurant[];
+}
+
+// Restaurant Details Respones
+export interface RestaurantDetailsResponse {
+  success: boolean;
+  restaurant: Restaurant;
 }
 
 // Restaurant Orders

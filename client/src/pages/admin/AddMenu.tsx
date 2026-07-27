@@ -34,7 +34,7 @@ function AddMenu() {
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
   const [input, setInput] = useState<MenuInputState>({
-    name: "",
+    fullname: "",
     description: "",
     price: "",
   });
@@ -63,7 +63,7 @@ function AddMenu() {
     if (!result.success) {
       const { fieldErrors } = z.flattenError(result.error);
       setInputErrors({
-        name: fieldErrors.name?.[0],
+        fullname: fieldErrors.name?.[0],
         description: fieldErrors.description?.[0],
         price: fieldErrors.price?.[0],
       });
@@ -87,7 +87,7 @@ function AddMenu() {
     addMenu(formData, {
       onSuccess: async (data) => {
         toast.success(data.message);
-        setInput({ name: "", description: "", price: "" });
+        setInput({ fullname: "", description: "", price: "" });
         setImageFile(null);
         setOpen(false);
         await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });

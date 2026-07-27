@@ -53,9 +53,13 @@ function Register() {
     mutate(input, {
       onSuccess: async (data) => {
         setInput({ fullname: "", email: "", password: "", contact: "" });
-        toast.success(data?.message);
+        toast.success(data?.message, { duration: 1000 });
         navigate("/verify-email");
         await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        toast.info("Verification code sent to your email", {
+          position: "top-center",
+          duration: 4000,
+        });
       },
       onError: (error: any) => {
         setApiError(error?.response?.data?.nessage || "Register failed");

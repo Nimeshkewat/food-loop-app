@@ -12,9 +12,6 @@ import { useGetRestaurantOrders } from "@/hooks/admin/restaurant/useGetRestauran
 
 function AdminOrders() {
   const { data, isLoading } = useGetRestaurantOrders();
-
-  console.log(data);
-
   if (isLoading) return <Loader />;
 
   return data?.orders.length === 0 ? (
@@ -26,21 +23,22 @@ function AdminOrders() {
       </h1>
       <div className="space-y-8">
         {/* restaurant orders */}
-        {data?.orders.map((_, index: number) => (
+        {data?.orders.map((order, index: number) => (
           <div
             key={index}
             className="flex flex-col md:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700"
           >
             <div className="flex-1 mb-6 sm:mb-0">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                Order name
+                Name: {order.user.fullname}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                <span className="font-semibold">Address:</span> Lorem, ipsum
-                dolor.
+                <span className="font-semibold">Address:</span>{" "}
+                {order.user.address}
               </p>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                <span className="font-semibold">Amount: </span> 400
+                <span className="font-semibold">Amount: </span>{" "}
+                {order.totalAmount}
               </p>
             </div>
             <div className="w-full sm:w-1/3 space-y-2">

@@ -65,6 +65,7 @@ export interface ResetPasswordResponse {
 export interface ProfileInputState {
   fullname: string;
   email: string;
+  contact: number;
   address: string;
   city: string;
   country: string;
@@ -76,7 +77,6 @@ export interface ProfileResponse {
   message: string;
   user: User;
 }
-
 export interface UpdateProfileResponse {
   success: boolean;
   message: string;

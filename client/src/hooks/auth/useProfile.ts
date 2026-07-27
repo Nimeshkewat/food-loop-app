@@ -1,4 +1,5 @@
 import api from "@/axios";
+import type { ApiError } from "@/types/api";
 import type { ProfileResponse } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,7 +9,7 @@ const getProfile = async (): Promise<ProfileResponse> => {
 };
 
 export const useProfile = () => {
-  return useQuery<ProfileResponse>({
+  return useQuery<ProfileResponse, ApiError>({
     queryKey: ["profile"],
     queryFn: getProfile,
     retry: false,

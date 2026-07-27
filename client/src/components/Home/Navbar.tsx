@@ -43,8 +43,12 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import { useAuth } from "@/context/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useGetCart } from "@/hooks/cart/useGetCart";
 
 function Navbar() {
+  const { data } = useGetCart();
+  const cartLength = data?.cart?.items?.length || 0;
+
   const { isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -118,9 +122,11 @@ function Navbar() {
 
             <Link to="/cart" className="relative cursor-pointer">
               <ShoppingCart />
-              <span className="bg-red-500 absolute -top-2 -left-1 text-white w-4 h-4 rounded-full text-center text-xs">
-                5
-              </span>
+              {cartLength > 0 && (
+                <span className="bg-red-500 absolute -top-2 -left-1 text-white w-4 h-4 rounded-full text-center text-xs">
+                  {cartLength}
+                </span>
+              )}
             </Link>
             {isAuthenticated && (
               <div>

@@ -3,7 +3,7 @@ export interface Menu {
   restaurant: string;
   name: string;
   description: string;
-  price: number;
+  price: string;
   image: string;
   createdAt: string;
   updatedAt: string;
