@@ -10,8 +10,8 @@ export const sendVerificationEmail = async (
     from: process.env.SENDER_EMAIL,
     to: email,
     subject: "Veriy your email",
-    text: `your 6-digiti verification code: ${verificationToken}`,
-    html: "<h1>Html body</h1>",
+    text: `your 6-digit verification code: ${verificationToken}`,
+    html: `<p>your 6-digit verification code: ${verificationToken}</p>`,
   });
 };
 
@@ -19,8 +19,8 @@ export const sendVerificationSuccessEmail = async (email: string) => {
   await transporter.sendMail({
     from: process.env.SENDER_EMAIL,
     to: email,
-    subject: "Your email is verified",
-    html: "<b>Html body</b>",
+    subject: "Email verification successfully",
+    html: "<b>Your email is verified</b>",
   });
 };
 

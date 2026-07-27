@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.post("/checkout", isAuthenticated, checkout);
-router.post("/verify", isAuthenticated, verify);
+router.post("/", isAuthenticated, checkout);
+router.post("/verify-payment", isAuthenticated, verify);
 router.get("/", isAuthenticated, getAllOrders);
 
 export default router;

@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 //* Raw body parsing is required here so the signature check in the
 //* webhook controller can hash the exact bytes Razorpay signed.
 app.use(
-  "/api/order/webhook",
+  "/api/v1/orders/webhook",
   express.raw({ type: "application/json" }),
   webhook,
 );
@@ -43,7 +43,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/restaurants", restaurantRouter);
 app.use("/api/v1/menus", menuRouter);
 app.use("/api/v1/cart", cartRouter);
-app.post("/api/order", orderRouter);
+app.use("/api/v1/orders", orderRouter);
 
 app.listen(PORT, () => {
   connectDB();

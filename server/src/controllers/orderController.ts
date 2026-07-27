@@ -114,11 +114,11 @@ export const verify = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
-      data: order,
     });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
+    console.log(errorMessage);
     res.status(500).json({ success: false, message: errorMessage });
   }
 };

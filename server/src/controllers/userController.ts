@@ -247,7 +247,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
     // const SELECT = "-isActive -password -verificationToken -verificationTokenExpiresAt";
     const user = await User.findOne({ _id: id, isActive: true })
-      .select("fullname email address city country profilePicture")
+      .select("fullname email address contact city country profilePicture")
       .exec();
     if (!user) {
       return res
@@ -257,7 +257,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Profile updated successfully",
+      message: "Profile fetched successfully",
       user,
     });
   } catch (error) {
@@ -289,7 +289,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
 
     user.fullname = fullname || user.fullname;
-    user.contact = contact || user.contact;
+    user.contact = Number(contact) || user.contact;
     user.address = address || user.address;
     user.city = city || user.city;
     user.country = country || user.country;

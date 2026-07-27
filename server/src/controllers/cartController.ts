@@ -49,7 +49,6 @@ export const addToCart = async (req: Request, res: Response) => {
     const existingItem = cart.items.find((item: any) =>
       item.menuId.equals(menu._id),
     );
-    console.log(existingItem);
 
     if (existingItem) {
       existingItem.quantity += qty;
