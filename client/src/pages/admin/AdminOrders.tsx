@@ -9,10 +9,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetRestaurantOrders } from "@/hooks/admin/restaurant/useGetRestaurantOrders";
+import { useUpdateOrderStatus } from "@/hooks/admin/restaurant/useUpdateOrderStatus";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
 
 function AdminOrders() {
   const { data, isLoading } = useGetRestaurantOrders();
+  const { mutate: updateStatus } = useUpdateOrderStatus();
+  const queryClient = useQueryClient();
+
+  const [updatinOrderId, setUpdatinOrderId] = useState<string | null>("");
   if (isLoading) return <Loader />;
+
+  const handleUpdateOrderStatus = (orderId: string, status: string) => {
+    setUpdatinOrderId(orderId);
+    const newStatus = status.toString();
+    updateStatus(
+      { orderId, status: newStatus },
+      {
+        onSuccess: async (data) => {
+          console.log(data);
+          toast.success(data.message);
+          await queryClient.invalidateQueries({
+            queryKey: ["FetchRestaurantOrders"],
+          });
+        },
+        onError: (error) => {
+          console.log(
+            error?.response?.data?.message || "Failed to change order status",
+          );
+        },
+        onSettled: () => {
+          setUpdatinOrderId(null);
+        },
+      },
+    );
+  };
 
   return data?.orders.length === 0 ? (
     <div>No Orders Found</div>
@@ -43,7 +76,13 @@ function AdminOrders() {
             </div>
             <div className="w-full sm:w-1/3 space-y-2">
               <Label>Order Status</Label>
-              <Select>
+              <Select
+                value={order.status}
+                onValueChange={(status) =>
+                  handleUpdateOrderStatus(order._id, status!)
+                }
+                disabled={updatinOrderId === order._id}
+              >
                 <SelectTrigger aria-invalid>
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>

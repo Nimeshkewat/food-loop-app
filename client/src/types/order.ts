@@ -79,3 +79,14 @@ export interface GetOrderByIdResponse {
   success: boolean;
   order: Order;
 }
+
+export interface UpdateOrderStatusInputState {
+  orderId: string;
+  status: string;
+}
+
+export interface UpdateOrderStatusResponse {
+  success: boolean;
+  message: string;
+  order: Order;
+}
