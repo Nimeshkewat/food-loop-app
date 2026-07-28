@@ -55,38 +55,45 @@ function SearchPage() {
           </div>
           <div>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 my-3">
-              <h1 className="font-medium text-lg">
-                ({data?.restaurants.length}) Search result found
-              </h1>
-              <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
-                {selectedCuisines.map((cuisine) => (
-                  <div
-                    className="relative inline-flex items-center max-w-full"
-                    key={cuisine}
-                  >
-                    <Badge
-                      variant="outline"
-                      className="text-primary pr-5 rounded-md cursor-pointer"
+              {data?.restaurants.length !== 0 && (
+                <h1 className="font-medium text-lg">
+                  ({data?.restaurants.length}) Search result found
+                </h1>
+              )}
+
+              {data?.restaurants.length === 0 ? (
+                <NoResultFound searchText={searchText} />
+              ) : (
+                <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
+                  {selectedCuisines.map((cuisine) => (
+                    <div
+                      className="relative inline-flex items-center max-w-full"
+                      key={cuisine}
                     >
-                      {cuisine}
-                    </Badge>
-                    <X
-                      size={15}
-                      className="absolute right-0 text-xs text-primary cursor-pointer"
-                      onClick={() => toggleCuisine(cuisine)}
-                    />
-                  </div>
-                ))}
-              </div>
+                      <Badge
+                        variant="outline"
+                        className="text-primary pr-5 rounded-md cursor-pointer"
+                      >
+                        {cuisine}
+                      </Badge>
+                      <X
+                        size={15}
+                        className="absolute right-0 text-xs text-primary cursor-pointer"
+                        onClick={() => toggleCuisine(cuisine)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {isLoading ? (
               <Loader />
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {data?.restaurants.map((restaurant, index: number) => (
+                {data?.restaurants.map((restaurant) => (
                   <Card
-                    key={index}
+                    key={restaurant._id}
                     className="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-200"
                   >
                     <div className="relative">
@@ -152,55 +159,19 @@ function SearchPage() {
 
 export default SearchPage;
 
-// function SearchPageSkeleton() {
-//   return (
-//     <>
-//       {[...Array(3)].map((_, index) => (
-//         <Card
-//           key={index}
-//           className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden"
-//         >
-//           <div className="relative">
-//             <AspectRatio ratio={16 / 6}>
-//               <Skeleton className="w-full h-full" />
-//             </AspectRatio>
-//           </div>
-//           <CardContent className="p-4">
-//             <Skeleton className="h-8 w-3/4 mb-2" />
-//             <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
-//               <Skeleton className="h-4 w-1/2" />
-//             </div>
-//             <div className="mt-2 flex gap-1 items-center text-gray-600 dark:text-gray-400">
-//               <Skeleton className="h-4 w-1/2" />
-//             </div>
-//             <div className="flex gap-2 mt-4 flex-wrap">
-//               <Skeleton className="h-6 w-20" />
-//               <Skeleton className="h-6 w-20" />
-//               <Skeleton className="h-6 w-20" />
-//             </div>
-//           </CardContent>
-//           <CardFooter className="p-4  dark:bg-gray-900 flex justify-end">
-//             <Skeleton className="h-10 w-24 rounded-full" />
-//           </CardFooter>
-//         </Card>
-//       ))}
-//     </>
-//   );
-// }
-
-// function NoResultFound({ searchText }: { searchText: string }) {
-//   return (
-//     <div className="text-center">
-//       <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-//         No results found
-//       </h1>
-//       <p className="mt-2 text-gray-500 dark:text-gray-400">
-//         We couldn't find any results for "{searchText}". <hr /> Try searching
-//         with a different term.
-//       </p>
-//       <Link to="/">
-//         <Button className="mt-4">Go Back to Home</Button>
-//       </Link>
-//     </div>
-//   );
-// }
+function NoResultFound({ searchText }: { searchText: string }) {
+  return (
+    <div className="text-center">
+      <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
+        No results found
+      </h1>
+      <p className="mt-2 text-gray-500 dark:text-gray-400">
+        We couldn't find any results for "{searchText}". <hr /> Try searching
+        with a different term.
+      </p>
+      <Link to="/">
+        <Button className="mt-4">Go Back to Home</Button>
+      </Link>
+    </div>
+  );
+}
