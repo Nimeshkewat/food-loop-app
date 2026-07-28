@@ -25,7 +25,6 @@ router.put(
 );
 
 router.get("/orders", isAuthenticated, getRestaurantOrders);
-router.patch("/orders/:orderId/status", isAuthenticated, updateOrderStatus);
 router.get("/search/:searchText", getRestaurantWithFilters);
 router.get("/:restaurantId", getSingleRestaurant);
 

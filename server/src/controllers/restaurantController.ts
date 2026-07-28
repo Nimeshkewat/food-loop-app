@@ -130,33 +130,6 @@ export const getRestaurantOrders = async (req: Request, res: Response) => {
   }
 };
 
-export const updateOrderStatus = async (req: Request, res: Response) => {
-  try {
-    const { orderId } = req.params;
-    const { status } = req.body;
-
-    const order = await Order.findByIdAndUpdate(
-      orderId,
-      { status },
-      { returnDocument: "after" },
-    ).exec();
-
-    if (!order) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found" });
-    }
-
-    res
-      .status(200)
-      .json({ success: true, message: "Order status updated", order });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(500).json({ success: false, message: errorMessage });
-  }
-};
-
 export const deleteRestaurant = async (req: Request, res: Response) => {
   try {
     const { id } = req.user;
