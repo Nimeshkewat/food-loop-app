@@ -7,12 +7,14 @@ import {
 } from "../controllers/menuController.js";
 import isAuthenticated from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
+import { uploadImageLimiter } from "../middlewares/rateLimiters.js";
 
 const router = express.Router();
 
 router.post("/", isAuthenticated, upload.single("imageFile"), addMenu);
 router.patch(
   "/:menuId/edit",
+  uploadImageLimiter,
   isAuthenticated,
   upload.single("imageFile"),
   editMenu,

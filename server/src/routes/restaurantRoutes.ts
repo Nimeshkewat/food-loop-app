@@ -10,12 +10,19 @@ import {
 } from "../controllers/restaurantController.js";
 import isAuthenticated from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
+import { uploadImageLimiter } from "../middlewares/rateLimiters.js";
 
 const router = express.Router();
 
 router.post("/", isAuthenticated, upload.single("imageFile"), createRestaurant);
 router.get("/", isAuthenticated, getRestaurant);
-router.put("/", isAuthenticated, upload.single("imageFile"), updateRestaurant);
+router.put(
+  "/",
+  uploadImageLimiter,
+  isAuthenticated,
+  upload.single("imageFile"),
+  updateRestaurant,
+);
 
 router.get("/orders", isAuthenticated, getRestaurantOrders);
 router.patch("/orders/:orderId/status", isAuthenticated, updateOrderStatus);
