@@ -52,9 +52,9 @@ function Cart() {
           await queryClient.invalidateQueries({ queryKey: ["fetchCart"] });
         },
         onError: (error) => {
-          toast.error(
-            error?.response?.data?.message || "Failed to update quantity",
-          );
+          const errorMessage = error?.response?.data?.message;
+          if (errorMessage === "Quantity is required") return;
+          toast.error(errorMessage || "Failed to update quantity");
         },
       },
     );
@@ -75,7 +75,6 @@ function Cart() {
   const handleClearCart = () => {
     clearCart(null, {
       onSuccess: async (data) => {
-        console.log(data);
         toast.success(data.message);
         await queryClient.invalidateQueries({ queryKey: ["fetchCart"] });
       },
