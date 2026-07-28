@@ -79,7 +79,7 @@ function Navbar() {
           <div className="flex items-center gap-6">
             <Link to="/">Home</Link>
             {isAuthenticated && <Link to="/profile">Profile</Link>}
-            {isAuthenticated && <Link to="/order-status">Order</Link>}
+            {isAuthenticated && <Link to="/orders">Order</Link>}
 
             {isAuthenticated && isAdmin && (
               <Menubar>
@@ -211,7 +211,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           )}
           {isAuthenticated && (
             <Link
-              to="/order-status"
+              to="/orders"
               className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
