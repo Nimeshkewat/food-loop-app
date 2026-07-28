@@ -138,7 +138,7 @@ function CheckoutConfirmation({
                     await queryClient.invalidateQueries({
                       queryKey: ["myOrders"],
                     });
-                    navigate("/order-status");
+                    navigate(`/orders/${verifyData.orderId}/success`);
                   },
                   onError: (error) => {
                     toast.error(

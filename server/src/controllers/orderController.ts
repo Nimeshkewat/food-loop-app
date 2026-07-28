@@ -114,6 +114,7 @@ export const verify = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
+      orderId: order._id,
     });
   } catch (error) {
     const errorMessage =
@@ -176,6 +177,26 @@ export const webhook = async (req: Request, res: Response) => {
   }
 };
 
+export const getOrderById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.user;
+    const { orderId } = req.params;
+    const order = await Order.findOne({ user: id, _id: orderId }).exec();
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, order });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ success: false, message: errorMessage });
+  }
+};
+
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
     const { id } = req.user;
@@ -183,7 +204,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
       .populate("user restaurant")
       .exec();
 
-    res.status(200).json({ success: true, data: orders });
+    res.status(200).json({ success: true, orders });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

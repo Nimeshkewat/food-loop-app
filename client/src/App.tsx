@@ -13,13 +13,14 @@ import Cart from "./pages/Cart";
 import Restaurant from "./pages/admin/Restaurant";
 import AddMenu from "./pages/admin/AddMenu";
 import AdminOrders from "./pages/admin/AdminOrders";
-import Success from "./pages/Success";
 import PublicRoute from "./components/protected-routes/PublicRoute";
 import PrivateRoute from "./components/protected-routes/PrivateRoute";
 import AdminRoute from "./components/protected-routes/AdminRoute";
 import { useAuth } from "./context/AuthProvider";
 import Loader from "./components/ui/Loader";
 import NotFound from "./pages/not-found/NotFound";
+import MyOrders from "./pages/order/MyOrders";
+import Success from "./pages/order/Success";
 
 function App() {
   const { isLoading } = useAuth();
@@ -51,7 +52,15 @@ function App() {
           }
         />
         <Route
-          path="/order-status"
+          path="/orders"
+          element={
+            <PrivateRoute>
+              <MyOrders />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/orders/:orderId/success"
           element={
             <PrivateRoute>
               <Success />
