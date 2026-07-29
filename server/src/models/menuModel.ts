@@ -17,7 +17,7 @@ const menuSchema = new mongoose.Schema<IMenuDocument>(
   {
     restaurant: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "restaurant",
+      ref: "Restaurant",
       required: true,
     },
     name: { type: String, required: true },

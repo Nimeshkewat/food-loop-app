@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createRestaurant,
+  deleteRestaurant,
   getRestaurant,
   getRestaurantOrders,
   getRestaurantWithFilters,
@@ -23,6 +24,7 @@ router.put(
   upload.single("imageFile"),
   updateRestaurant,
 );
+router.delete("/delete", isAuthenticated, deleteRestaurant);
 
 router.get("/orders", isAuthenticated, getRestaurantOrders);
 router.get("/search/:searchText", getRestaurantWithFilters);

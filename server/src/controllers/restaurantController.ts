@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import Restaurant from "../models/restaurantModel.js";
 import uploadToCloudinary from "../utils/uploadImage.js";
 import Order from "../models/orderModel.js";
+import Menu from "../models/menuModel.js";
+import Cart from "../models/cartModel.js";
 
 export const createRestaurant = async (req: Request, res: Response) => {
   try {
@@ -140,6 +142,11 @@ export const deleteRestaurant = async (req: Request, res: Response) => {
         .status(404)
         .json({ success: false, message: "Restaurant not found" });
     }
+
+    await Promise.all([
+      await Menu.deleteMany({ restaurant: restaurant._id }),
+      await Cart.deleteMany({ restaurant: restaurant._id }),
+    ]);
 
     res
       .status(200)

@@ -19,7 +19,7 @@ export interface IOrder extends Document {
   user: mongoose.Schema.Types.ObjectId;
   restaurant: mongoose.Schema.Types.ObjectId;
   deliveryDetails: DeliveryDetailsType;
-  cartItems: CartItemsType;
+  cartItems: CartItemsType[];
   totalAmount: number;
   status:
     | "pending"
@@ -47,7 +47,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
       required: true,
     },
     deliveryDetails: {
-      fullname: { type: String, required: true },
+      name: { type: String, required: true },
       email: { type: String, required: true },
       address: { type: String, required: true },
       city: { type: String, required: true },

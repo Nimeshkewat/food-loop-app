@@ -245,7 +245,6 @@ export const getProfile = async (req: Request, res: Response) => {
   try {
     const { id } = req.user;
 
-    // const SELECT = "-isActive -password -verificationToken -verificationTokenExpiresAt";
     const user = await User.findOne({ _id: id, isActive: true })
       .select("fullname email address contact city country profilePicture")
       .exec();
