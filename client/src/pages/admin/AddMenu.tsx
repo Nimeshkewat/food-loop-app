@@ -34,7 +34,7 @@ function AddMenu() {
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
   const [input, setInput] = useState<MenuInputState>({
-    fullname: "",
+    name: "",
     description: "",
     price: "",
   });
@@ -63,7 +63,7 @@ function AddMenu() {
     if (!result.success) {
       const { fieldErrors } = z.flattenError(result.error);
       setInputErrors({
-        fullname: fieldErrors.name?.[0],
+        name: fieldErrors.name?.[0],
         description: fieldErrors.description?.[0],
         price: fieldErrors.price?.[0],
       });
@@ -87,7 +87,7 @@ function AddMenu() {
     addMenu(formData, {
       onSuccess: async (data) => {
         toast.success(data.message);
-        setInput({ fullname: "", description: "", price: "" });
+        setInput({ name: "", description: "", price: "" });
         setImageFile(null);
         setOpen(false);
         await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });
@@ -101,7 +101,6 @@ function AddMenu() {
   const handleMenuDelete = (menuId: string) => {
     deleteMenu(menuId, {
       onSuccess: async (data) => {
-        console.log(data);
         toast.success(data.message);
         await queryClient.invalidateQueries({ queryKey: ["fetchMenus"] });
       },
@@ -111,7 +110,6 @@ function AddMenu() {
     });
   };
 
-  console.log(data);
   if (isLoading) return <Loader />;
 
   return (
@@ -210,16 +208,19 @@ function AddMenu() {
                 className="md:h-24 md:w-24 h-16 object-cover rounded-lg w-full"
               />
               <div className="flex-1">
-                <h1 className="text-lg font-semibold text-gray-800">
+                <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                   {menu.name}
                 </h1>
-                <p className="text-sm mt-1 text-gray-600">{menu.description}</p>
+                <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+                  {menu.description}
+                </p>
                 <h2 className="text-md font-semibold mt-2">
                   Price: <span className="text-primary">{menu.price}</span>
                 </h2>
               </div>
               <div className="flex flex-col md:w-30 w-full gap-2">
                 <Button
+                  className="dark:text-white"
                   onClick={() => {
                     setSelectedMenu(menu);
                     setEditOpen(true);
@@ -230,7 +231,7 @@ function AddMenu() {
                 <Button
                   disabled={isDeleting}
                   onClick={() => handleMenuDelete(menu._id)}
-                  className="bg-red-500 border-red-100 hover:bg-red-400 cursor-pointer"
+                  className="bg-red-500 dark:text-white hover:bg-red-400 cursor-pointer"
                 >
                   {isDeleting ? <Loader2 className="animate-spin" /> : "Remove"}
                 </Button>

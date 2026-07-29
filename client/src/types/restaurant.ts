@@ -80,3 +80,8 @@ export interface RestaurantOrdersResponse {
   success: boolean;
   orders: Order[];
 }
+
+export interface DeleteRestaurantResponse {
+  success: boolean;
+  message: string;
+}

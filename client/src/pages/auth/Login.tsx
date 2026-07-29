@@ -61,9 +61,9 @@ function Login() {
     <div className="flex  items-center justify-center min-h-screen">
       <form
         onSubmit={handleSubmit}
-        className=" md:p-8 p-4 mx-4  w-full max-w-md md:border border-gray-200 rounded-lg"
+        className=" md:p-8 p-4 mx-4  w-full max-w-md md:border border-gray-300 dark:border-gray-700 rounded-lg"
       >
-        <h1 className="text-center font-bold text-2xl mb-4">Javascript Eats</h1>
+        <h1 className="text-center font-bold text-2xl mb-4">Food Loop</h1>
         {apiError && (
           <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
             {apiError}

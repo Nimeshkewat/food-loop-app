@@ -111,7 +111,6 @@ function Restaurant() {
     if (restaurantAlreadyExist) {
       updateRestaurant(formData, {
         onSuccess: (data) => {
-          console.log(data);
           toast.success(data.message);
           queryClient.invalidateQueries({ queryKey: ["fetchRestaurant"] });
         },
@@ -270,7 +269,7 @@ function Restaurant() {
           </div>
         </div>
 
-        <div className="my-6">
+        <div className="my-6  flex items-center flex-col md:flex-row gap-4">
           {restaurantAlreadyExist ? (
             <Button type="submit" disabled={isUpdating || !hasChanges}>
               {isUpdating ? (

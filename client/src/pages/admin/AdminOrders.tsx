@@ -29,7 +29,6 @@ function AdminOrders() {
       { orderId, status: newStatus },
       {
         onSuccess: async (data) => {
-          console.log(data);
           toast.success(data.message);
           await queryClient.invalidateQueries({
             queryKey: ["FetchRestaurantOrders"],
