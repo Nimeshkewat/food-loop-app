@@ -49,7 +49,9 @@ function MenuList({ menus }: { menus: Menu[] }) {
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                 {menu?.name}
               </h2>
-              <p className="text-sm text-gray-600 mt-2">{menu?.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                {menu?.description}
+              </p>
               <h3 className="text-lg font-semibold mt-4">
                 Price: <span className="text-primary">₹{menu?.price}</span>
               </h3>

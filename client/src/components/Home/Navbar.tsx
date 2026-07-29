@@ -44,8 +44,10 @@ import { useAuth } from "@/context/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetCart } from "@/hooks/cart/useGetCart";
+import { useTheme } from "@/context/ThemeProvider";
 
 function Navbar() {
+  const { setTheme } = useTheme();
   const { data } = useGetCart();
   const cartLength = data?.cart?.items?.length || 0;
 
@@ -110,10 +112,10 @@ function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
                     <Sun /> Light
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
                     <Moon /> Dark
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

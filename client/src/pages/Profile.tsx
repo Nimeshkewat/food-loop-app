@@ -111,7 +111,7 @@ function Profile() {
   if (isLoading) return <Loader />;
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+    <div className="max-w-4xl mx-auto my-10 p-6 bg-white dark:bg-black rounded-xl shadow-sm border border-gray-10">
       {apiError && (
         <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
           {apiError}
@@ -153,7 +153,7 @@ function Profile() {
               name="fullname"
               onChange={handleChange}
               value={profileData.fullname}
-              className="font-bold text-3xl outline-none border-b-2 border-transparent focus:border-gray-300 bg-transparent py-1 w-full text-gray-800"
+              className="font-bold text-3xl outline-none border-b-2 border-transparent focus:border-gray-300 bg-transparent py-1 w-full text-gray-800 dark:text-gray-200"
             />
             <span className="text-sm text-gray-400 mt-1">
               Click name to edit
@@ -175,7 +175,7 @@ function Profile() {
                 name="email"
                 value={profileData.email}
                 readOnly
-                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+                className="w-full text-gray-700 dark:text-gray-200  bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
           </CardContent>
@@ -193,7 +193,7 @@ function Profile() {
                 name="contact"
                 value={profileData.contact}
                 readOnly
-                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+                className="w-full text-gray-700 dark:text-gray-200  bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
           </CardContent>
@@ -211,7 +211,7 @@ function Profile() {
                 name="address"
                 value={profileData.address}
                 onChange={handleChange}
-                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+                className="w-full text-gray-700 dark:text-gray-200 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
           </CardContent>
@@ -229,7 +229,7 @@ function Profile() {
                 name="city"
                 value={profileData.city}
                 onChange={handleChange}
-                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+                className="w-full text-gray-700 dark:text-gray-200 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
           </CardContent>
@@ -247,7 +247,7 @@ function Profile() {
                 name="country"
                 value={profileData.country}
                 onChange={handleChange}
-                className="w-full text-gray-700 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
+                className="w-full text-gray-700 dark:text-gray-200 bg-transparent focus-visible:ring-0 p-0 h-6 border-none shadow-none"
               />
             </div>
           </CardContent>

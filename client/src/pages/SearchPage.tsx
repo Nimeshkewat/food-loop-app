@@ -133,7 +133,7 @@ function SearchPage() {
                           (cuisine: string, index: number) => (
                             <Badge
                               key={index}
-                              className="bg-black px-2 py-1 font-medium shadow-sm"
+                              className=" px-2 py-1 font-medium shadow-sm"
                             >
                               {cuisine}
                             </Badge>

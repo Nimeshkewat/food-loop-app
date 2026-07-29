@@ -28,9 +28,7 @@ function RestaurantDetails() {
             </h1>
             <div className="flex gap-2 my-2">
               {data?.restaurant?.cuisines.map((item: string, index: number) => (
-                <Badge className="bg-black" key={index}>
-                  {item}
-                </Badge>
+                <Badge key={index}>{item}</Badge>
               ))}
             </div>
             <div className="flex flex-col md:flex-row gap-2 my-5">
