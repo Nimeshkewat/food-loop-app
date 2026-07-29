@@ -45,10 +45,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetCart } from "@/hooks/cart/useGetCart";
 import { useTheme } from "@/context/ThemeProvider";
+import { useProfile } from "@/hooks/auth/useProfile";
 
 function Navbar() {
   const { setTheme } = useTheme();
   const { data } = useGetCart();
+  const { data: user } = useProfile();
   const cartLength = data?.cart?.items?.length || 0;
 
   const { isAdmin, isAuthenticated } = useAuth();
@@ -74,7 +76,7 @@ function Navbar() {
     <div className="max-w-7xl w-full mx-auto">
       <div className="flex items-center justify-between h-14 mx-5">
         <Link to="/" className="font-bold md:font-extrabold text-2xl">
-          Main Logo
+          Food Loop
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
@@ -133,8 +135,10 @@ function Navbar() {
             {isAuthenticated && (
               <div>
                 <Avatar onClick={() => navigate("/profile")}>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarImage src={user?.user.profilePicture} />
+                  <AvatarFallback>
+                    {user?.user.fullname.charAt(0).toUpperCase() || "CN"}
+                  </AvatarFallback>
                 </Avatar>
               </div>
             )}
@@ -163,9 +167,12 @@ function Navbar() {
 export default Navbar;
 const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
   const { isAuthenticated, isAdmin } = useAuth();
+  const { data } = useProfile();
+
+  const { isPending } = useLogout();
+  const { setTheme } = useTheme();
 
   const [isOpen, setIsOpen] = useState(false);
-  const { isPending } = useLogout();
   const navigate = useNavigate();
 
   return (
@@ -174,17 +181,17 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
       <Menu onClick={() => setIsOpen(true)} />{" "}
       <SheetContent showCloseButton={false}>
         <SheetHeader className="flex flex-row items-center justify-between">
-          <SheetTitle>Main Logo</SheetTitle>
+          <SheetTitle>Food Loop</SheetTitle>
           <DropdownMenu>
             <DropdownMenuTrigger render={<Button variant="outline" />}>
               <Sun />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
                   <Sun /> Light
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
                   <Moon /> Dark
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -195,7 +202,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
         <SheetDescription className="flex-1">
           <Link
             to="/"
-            className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
             onClick={() => setIsOpen(false)}
           >
             <Home />
@@ -204,7 +211,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           {isAuthenticated && (
             <Link
               to="/profile"
-              className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
               <User />
@@ -214,7 +221,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           {isAuthenticated && (
             <Link
               to="/orders"
-              className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
               <HandPlatter />
@@ -223,7 +230,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           )}
           <Link
             to="/cart"
-            className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+            className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
             onClick={() => setIsOpen(false)}
           >
             <ShoppingCart />
@@ -232,7 +239,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           {isAuthenticated && isAdmin && (
             <Link
               to="/admin/menu"
-              className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
               <SquareMenu />
@@ -242,7 +249,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           {isAuthenticated && isAdmin && (
             <Link
               to="/admin/restaurant"
-              className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
               <UtensilsCrossed />
@@ -252,7 +259,7 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
           {isAuthenticated && isAdmin && (
             <Link
               to="/admin/orders"
-              className="flex items-center gap-4 hover:bg-slate-100 py-2 px-4"
+              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
               <Package2Icon />
@@ -263,13 +270,17 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
         <SheetFooter className="flex flex-col gap-2">
           {isAuthenticated ? (
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2"
+              >
                 <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src={data?.user.profilePicture} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <h1 className="font-bold">Username</h1>
-              </div>
+                <h1 className="font-bold">{data?.user.fullname}</h1>
+              </Link>
               <Button onClick={handleLogout} disabled={isPending}>
                 {isPending ? <Loader2 className="animate-spin" /> : "Logout"}
               </Button>
