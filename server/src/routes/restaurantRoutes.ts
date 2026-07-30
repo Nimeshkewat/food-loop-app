@@ -6,7 +6,6 @@ import {
   getRestaurantOrders,
   getRestaurantWithFilters,
   getSingleRestaurant,
-  updateOrderStatus,
   updateRestaurant,
 } from "../controllers/restaurantController.js";
 import isAuthenticated from "../middlewares/auth.js";
