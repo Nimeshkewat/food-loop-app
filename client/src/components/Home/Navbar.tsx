@@ -157,7 +157,7 @@ function Navbar() {
         </div>
         {/* mobile screen */}
         <div className="md:hidden lg:hidden">
-          <MobileNavbar handleLogout={handleLogout} />
+          <MobileNavbar handleLogout={handleLogout} cartLength={cartLength} />
         </div>
       </div>
     </div>
@@ -165,7 +165,13 @@ function Navbar() {
 }
 
 export default Navbar;
-const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
+const MobileNavbar = ({
+  handleLogout,
+  cartLength,
+}: {
+  handleLogout: () => void;
+  cartLength: number;
+}) => {
   const { isAuthenticated, isAdmin } = useAuth();
   const { data } = useProfile();
 
@@ -176,122 +182,124 @@ const MobileNavbar = ({ handleLogout }: { handleLogout: () => void }) => {
   const navigate = useNavigate();
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      {" "}
-      <Menu onClick={() => setIsOpen(true)} />{" "}
-      <SheetContent showCloseButton={false}>
-        <SheetHeader className="flex flex-row items-center justify-between">
-          <SheetTitle>Food Loop</SheetTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="outline" />}>
-              <Sun />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun /> Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon /> Dark
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SheetHeader>
-        <Separator />
-        <SheetDescription className="flex-1">
-          <Link
-            to="/"
-            className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-            onClick={() => setIsOpen(false)}
-          >
-            <Home />
-            <span>Home</span>
-          </Link>
-          {isAuthenticated && (
+    <div className="flex items-center gap-3">
+      <Link to="/cart" className="relative">
+        <ShoppingCart />
+        {cartLength > 0 && (
+          <span className="bg-red-500 absolute -top-2 -left-1 text-white w-4 h-4 rounded-full text-center text-xs">
+            {cartLength}
+          </span>
+        )}
+      </Link>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        {" "}
+        <Menu onClick={() => setIsOpen(true)} />{" "}
+        <SheetContent showCloseButton={false}>
+          <SheetHeader className="flex flex-row items-center justify-between">
+            <SheetTitle>Food Loop</SheetTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="outline" />}>
+                <Sun />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <Sun /> Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    <Moon /> Dark
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SheetHeader>
+          <Separator />
+          <SheetDescription className="flex-1">
             <Link
-              to="/profile"
+              to="/"
               className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
               onClick={() => setIsOpen(false)}
             >
-              <User />
-              <span>Profile</span>
+              <Home />
+              <span>Home</span>
             </Link>
-          )}
-          {isAuthenticated && (
-            <Link
-              to="/orders"
-              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-              onClick={() => setIsOpen(false)}
-            >
-              <HandPlatter />
-              <span>Order</span>
-            </Link>
-          )}
-          <Link
-            to="/cart"
-            className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-            onClick={() => setIsOpen(false)}
-          >
-            <ShoppingCart />
-            <span>Cart</span>
-          </Link>
-          {isAuthenticated && isAdmin && (
-            <Link
-              to="/admin/menu"
-              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-              onClick={() => setIsOpen(false)}
-            >
-              <SquareMenu />
-              <span>Menu</span>
-            </Link>
-          )}
-          {isAuthenticated && isAdmin && (
-            <Link
-              to="/admin/restaurant"
-              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-              onClick={() => setIsOpen(false)}
-            >
-              <UtensilsCrossed />
-              <span>Restaurant</span>
-            </Link>
-          )}
-          {isAuthenticated && isAdmin && (
-            <Link
-              to="/admin/orders"
-              className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
-              onClick={() => setIsOpen(false)}
-            >
-              <Package2Icon />
-              <span>Restaurant Orders</span>
-            </Link>
-          )}
-        </SheetDescription>
-        <SheetFooter className="flex flex-col gap-2">
-          {isAuthenticated ? (
-            <div className="flex flex-col gap-2">
+            {isAuthenticated && (
               <Link
                 to="/profile"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2"
               >
-                <Avatar>
-                  <AvatarImage src={data?.user.profilePicture} />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <h1 className="font-bold">{data?.user.fullname}</h1>
+                <User />
+                <span>Profile</span>
               </Link>
-              <Button onClick={handleLogout} disabled={isPending}>
-                {isPending ? <Loader2 className="animate-spin" /> : "Logout"}
+            )}
+            {isAuthenticated && (
+              <Link
+                to="/orders"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
+                onClick={() => setIsOpen(false)}
+              >
+                <HandPlatter />
+                <span>Order</span>
+              </Link>
+            )}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin/menu"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
+                onClick={() => setIsOpen(false)}
+              >
+                <SquareMenu />
+                <span>Menu</span>
+              </Link>
+            )}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin/restaurant"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
+                onClick={() => setIsOpen(false)}
+              >
+                <UtensilsCrossed />
+                <span>Restaurant</span>
+              </Link>
+            )}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin/orders"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
+                onClick={() => setIsOpen(false)}
+              >
+                <Package2Icon />
+                <span>Restaurant Orders</span>
+              </Link>
+            )}
+          </SheetDescription>
+          <SheetFooter className="flex flex-col gap-2">
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-2">
+                <Link
+                  to="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2"
+                >
+                  <Avatar>
+                    <AvatarImage src={data?.user.profilePicture} />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <h1 className="font-bold">{data?.user.fullname}</h1>
+                </Link>
+                <Button onClick={handleLogout} disabled={isPending}>
+                  {isPending ? <Loader2 className="animate-spin" /> : "Logout"}
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => navigate("/login")} disabled={isPending}>
+                {isPending ? <Loader2 className="animate-spin" /> : "Login"}
               </Button>
-            </div>
-          ) : (
-            <Button onClick={() => navigate("/login")} disabled={isPending}>
-              {isPending ? <Loader2 className="animate-spin" /> : "Login"}
-            </Button>
-          )}
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+            )}
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 };
