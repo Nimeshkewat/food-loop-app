@@ -38,7 +38,11 @@ export const register = async (req: Request, res: Response) => {
     });
 
     // TODO: await sendVerificationEmail
-    await sendVerificationEmail(email, verificationToken);
+    try {
+      await sendVerificationEmail(email, verificationToken);
+    } catch (error) {
+      console.log("Failed to send email: ", error);
+    }
 
     res
       .status(201)
