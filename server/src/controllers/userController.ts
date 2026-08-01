@@ -84,7 +84,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: `Welcome back ${user.fullname}`,
+      message: `Welcome ${user.fullname}`,
     });
   } catch (error) {
     const errorMessage =
@@ -134,7 +134,11 @@ export const verifyEmail = async (req: Request, res: Response) => {
     await user.save();
 
     // TODO: Send welcome email
-    await sendVerificationSuccessEmail(user.email);
+    try {
+      await sendVerificationSuccessEmail(user.email);
+    } catch (error) {
+      console.log("Failed to send email: ", error);
+    }
 
     res.status(200).json({
       success: true,
@@ -171,7 +175,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // TODO: Send Password Reset Link
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${plainToken}`;
-    await sendPasswordResetLinkEmail(user.email, resetLink);
+
+    try {
+      await sendPasswordResetLinkEmail(user.email, resetLink);
+    } catch (error) {
+      console.log("Failed to send email: ", error);
+    }
 
     res.status(200).json({
       success: true,
@@ -217,7 +226,11 @@ export const resetPassword = async (req: Request, res: Response) => {
     await user.save();
 
     // TODO: Send success email for password reset
-    await sendPasswordResetSuccessEmail(user.email, user.fullname);
+    try {
+      await sendPasswordResetSuccessEmail(user.email, user.fullname);
+    } catch (error) {
+      console.log("Failed to send email: ", error);
+    }
 
     res.status(200).json({
       success: true,
