@@ -46,10 +46,10 @@ function Login() {
     //* Api implementation
     mutate(input, {
       onSuccess: async (data) => {
+        await queryClient.invalidateQueries();
         setInput({ email: "", password: "" });
         toast.success(data?.message);
         navigate("/");
-        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
       },
       onError: (error) => {
         setApiError(error?.response?.data?.message || "Login failed");

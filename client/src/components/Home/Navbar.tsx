@@ -62,7 +62,7 @@ function Navbar() {
   const handleLogout = () => {
     mutate(null, {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        await queryClient.invalidateQueries();
         toast.success(data?.message);
         navigate("/login");
       },
