@@ -49,14 +49,14 @@ function CheckoutConfirmation({
   }, 0);
 
   const [input, setInput] = useState<CheckoutConfirmationInputState>({
-    fullname: "",
+    name: "",
     email: "",
     address: "",
-    contact: "",
+    contact: 0, // was "" — matches number type from the start
     city: "",
   });
   const [inputErrors, setInputErrors] = useState<
-    Partial<CheckoutConfirmationInputState>
+    Partial<Record<keyof CheckoutConfirmationInputState, string>>
   >({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +70,7 @@ function CheckoutConfirmation({
   useEffect(() => {
     if (profileData) {
       setInput({
-        fullname: profileData?.user?.fullname || "",
+        name: profileData?.user?.fullname || "",
         email: profileData?.user?.email || "",
         contact: profileData?.user?.contact ?? 0,
         address: profileData.user.address || "",
@@ -86,7 +86,7 @@ function CheckoutConfirmation({
     if (!result.success) {
       const { fieldErrors } = z.flattenError(result.error);
       setInputErrors({
-        fullname: fieldErrors.fullname?.[0],
+        name: fieldErrors.name?.[0], // was fieldErrors.fullname
         email: fieldErrors.email?.[0],
         address: fieldErrors.address?.[0],
         city: fieldErrors.city?.[0],
@@ -95,11 +95,17 @@ function CheckoutConfirmation({
       return;
     }
     setInputErrors({});
-    // api implementation.
+
     createOrder(
       {
         cartItems: cartData?.cart.items || [],
-        deliveryDetails: input,
+        deliveryDetails: {
+          name: input.name,
+          email: input.email,
+          address: input.address,
+          city: input.city,
+          contact: input.contact,
+        },
         restaurantId: cartData?.cart.restaurant || "",
         totalAmount: totalAmount || 0,
       },
@@ -113,7 +119,7 @@ function CheckoutConfirmation({
             name: "Your Restaurant App",
             description: "Order Payment",
             prefill: {
-              name: input.fullname,
+              name: input.name,
               email: input.email,
               contact: String(input.contact),
             },
@@ -176,8 +182,8 @@ function CheckoutConfirmation({
           <DialogTitle>Review Your Order</DialogTitle>
         </DialogHeader>
 
-        <DialogDescription className="text-xs ">
-          Double-check your delivery details and ensure everythin is in order.
+        <DialogDescription className="text-xs">
+          Double-check your delivery details and ensure everything is in order.
           When you are ready, hit confirm button to finalize your order
         </DialogDescription>
         <form
@@ -188,13 +194,13 @@ function CheckoutConfirmation({
             <Label>Fullname</Label>
             <Input
               type="text"
-              name="fullname"
-              value={input.fullname}
+              name="name" // was "fullname" — must match state key
+              value={input.name}
               onChange={handleChange}
             />
-            {inputErrors.fullname && (
+            {inputErrors.name && (
               <p className="text-red-500 text-xs mt-1 pl-1 block">
-                {inputErrors.fullname}
+                {inputErrors.name}
               </p>
             )}
           </div>
@@ -258,7 +264,7 @@ function CheckoutConfirmation({
             <Button
               disabled={isOrderCreating}
               type="submit"
-              className="bg-black hover:bg-black/80"
+              className="bg-black dark:text-white hover:bg-black/80"
             >
               {isOrderCreating ? (
                 <Loader2 className="animate-spin" />

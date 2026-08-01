@@ -3,10 +3,10 @@ import type { Restaurant } from "./restaurant";
 import type { User } from "./user";
 
 export interface CheckoutConfirmationInputState {
-  fullname: string;
+  name: string;
   email: string;
   address: string;
-  contact: number | string;
+  contact: number;
   city: string;
 }
 
@@ -44,18 +44,12 @@ export interface VerifyPaymentResponse {
   message: string;
   orderId: string;
 }
-// types/order.ts — add _id
+
 export interface Order {
   _id: string;
   user: User;
   restaurant: Restaurant;
-  deliveryDetails: {
-    fullname: string;
-    email: string;
-    address: string;
-    city: string;
-    contact: number;
-  };
+  deliveryDetails: CheckoutConfirmationInputState; // reuse instead of redefining with "fullname"
   cartItems: CartItem[];
   totalAmount: number;
   status:
