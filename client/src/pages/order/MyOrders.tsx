@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGetOrders } from "@/hooks/order/useGetOrders";
 import { IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
+import Review from "./Review";
 
 function MyOrders() {
   const { data, isLoading } = useGetOrders();
@@ -64,17 +65,16 @@ function MyOrders() {
             ))}
 
             <div className="flex justify-between font-semibold text-gray-800 dark:text-gray-200 mt-3">
-              <span>Total</span>
+              <span className="text-lg">Total</span>
               <div className="flex items-center">
                 <IndianRupee size={16} />
-                <span>{order.totalAmount}</span>
+                <span className="text-lg">{order.totalAmount}</span>
               </div>
             </div>
-
-            <Separator className="my-4" />
+            {order.status === "delivered" && <Review />}
+            <Separator className="my-1" />
           </div>
         ))}
-
         <Link to="/">
           <Button className="w-full">Continue Shopping</Button>
         </Link>
