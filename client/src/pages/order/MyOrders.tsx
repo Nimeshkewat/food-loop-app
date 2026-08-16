@@ -1,4 +1,3 @@
-// Success.tsx
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/Loader";
 import { Separator } from "@/components/ui/separator";
@@ -71,7 +70,7 @@ function MyOrders() {
                 <span className="text-lg">{order.totalAmount}</span>
               </div>
             </div>
-            {order.status === "delivered" && <Review />}
+            {order.status === "delivered" && <Review orderId={order._id} />}
             <Separator className="my-1" />
           </div>
         ))}
