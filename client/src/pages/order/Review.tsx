@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Star, Utensils, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useCreateReview } from "@/hooks/review/useCreateReview";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-export function Review() {
+export function Review({ orderId }: { orderId: string }) {
   const [open, setOpen] = useState(false);
   const [foodRating, setFoodRating] = useState(0);
   const [hoveredFoodRating, setHoveredFoodRating] = useState(0);
@@ -22,26 +25,32 @@ export function Review() {
   const [hoveredDeliveryRating, setHoveredDeliveryRating] = useState(0);
 
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const { mutate, isPending } = useCreateReview();
+  const queryClient = useQueryClient();
+
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // Simulate API submission
-    setTimeout(() => {
-      console.log({
-        foodRating,
-        deliveryRating,
-        comment,
-      });
-      setIsSubmitting(false);
-      setOpen(false);
-      // Reset form state
-      setFoodRating(0);
-      setDeliveryRating(0);
-      setComment("");
-    }, 800);
+    mutate(
+      { orderId, foodRating, deliveryRating, comment },
+      {
+        onSuccess: async (data) => {
+          console.log(data);
+          toast.success(data.message);
+          setOpen(false);
+          setFoodRating(0);
+          setDeliveryRating(0);
+          setComment("");
+          await queryClient.invalidateQueries({ queryKey: ["myOrders"] });
+        },
+        onError: (error) => {
+          toast.error(
+            error?.response?.data.message || "Failed to create review",
+          );
+        },
+      },
+    );
   };
 
   const renderStarPicker = (
@@ -80,8 +89,8 @@ export function Review() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="w-full">
-        <Button className="mt-2 w-full">Leave a Review</Button>
+      <DialogTrigger className="mt-2 w-full cursor-pointer bg-primary py-1 rounded-lg text-white dark:text-black">
+        Leave a Review
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
@@ -136,12 +145,8 @@ export function Review() {
           </div>
 
           <DialogFooter>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={foodRating === 0 || isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Review"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Submitting..." : "Submit Review"}
             </Button>
           </DialogFooter>
         </form>
