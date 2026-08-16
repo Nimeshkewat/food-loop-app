@@ -11,6 +11,7 @@ import restaurantRouter from "./routes/restaurantRoutes.js";
 import menuRouter from "./routes/menuRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import cartRouter from "./routes/cartRoutes.js";
+import reviewRouter from "./routes/reviewRoutes.js";
 
 import { webhook } from "./controllers/orderController.js";
 
@@ -44,6 +45,7 @@ app.use("/api/v1/restaurants", restaurantRouter);
 app.use("/api/v1/menus", menuRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/orders", orderRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.listen(PORT, () => {
   connectDB();
