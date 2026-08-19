@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import crypto from "crypto";
 import instance from "../config/razorpay.js";
 import Order from "../models/orderModel.js";
+import Review from "../models/reviewModel.js";
 
 //* 1. CHECKOUT — called when the user clicks "Place Order" on the frontend.
 //*    Creates a Razorpay order + a matching Mongo order (status: pending),
@@ -202,9 +203,23 @@ export const getAllOrders = async (req: Request, res: Response) => {
     const { id } = req.user;
     const orders = await Order.find({ user: id })
       .populate("user restaurant")
+      .sort({ createdAt: -1 })
       .exec();
 
-    res.status(200).json({ success: true, orders });
+    const orderIds = orders.map((order) => order._id);
+    const reviews = await Review.find({ order: { $in: orderIds } }).exec();
+    const reviewMap = new Map(reviews.map((r) => [r.order.toString(), r]));
+
+    const ordersWithReviewFlag = orders.map((order) => {
+      const review = reviewMap.get(order._id.toString());
+      return {
+        ...order.toObject(),
+        hasReview: !!review,
+        review: review || null,
+      };
+    });
+
+    res.status(200).json({ success: true, orders: ordersWithReviewFlag });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
