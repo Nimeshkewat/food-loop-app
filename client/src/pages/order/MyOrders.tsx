@@ -22,16 +22,16 @@ import { useQueryClient } from "@tanstack/react-query";
 
 function MyOrders() {
   const { data, isLoading } = useGetOrders();
-  const [open, setOpen] = useState(false);
+  const [openReviewId, setOpenReviewId] = useState<string | null>(null);
 
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
   const queryClient = useQueryClient();
 
-  const handleDeleteReview = (reviewid: string) => {
-    deleteReview(reviewid, {
+  const handleDeleteReview = (reviewId: string | undefined) => {
+    if (!reviewId) return;
+    deleteReview(reviewId, {
       onSuccess: async (data) => {
-        console.log(data);
-        setOpen(false);
+        setOpenReviewId(null);
         toast.success(data.message);
         await queryClient.invalidateQueries({ queryKey: ["myOrders"] });
       },
@@ -119,12 +119,17 @@ function MyOrders() {
             {order.status === "delivered" && order.hasReview && (
               <div>
                 <Button
-                  onClick={() => setOpen(true)}
+                  onClick={() => setOpenReviewId(order._id)}
                   className="text-red-500 border-2 hover:bg-transparent border-red-700 bg-transparent mt-2 w-full cursor-pointer"
                 >
                   Delete Your Review
                 </Button>
-                <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialog
+                  open={openReviewId === order._id}
+                  onOpenChange={(isOpen) =>
+                    setOpenReviewId(isOpen ? order._id : null)
+                  }
+                >
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
@@ -139,9 +144,7 @@ function MyOrders() {
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         disabled={isDeleting}
-                        onClick={() =>
-                          handleDeleteReview(order.review?._id as string)
-                        }
+                        onClick={() => handleDeleteReview(order.review?._id)}
                       >
                         {isDeleting ? (
                           <Loader2 className="animate-spin" />
