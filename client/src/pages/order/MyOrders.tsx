@@ -2,13 +2,44 @@ import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/Loader";
 import { Separator } from "@/components/ui/separator";
 import { useGetOrders } from "@/hooks/order/useGetOrders";
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Review from "./Review";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { useDeleteReview } from "@/hooks/review/useDeleteReview";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 function MyOrders() {
   const { data, isLoading } = useGetOrders();
+  const [open, setOpen] = useState(false);
 
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
+  const queryClient = useQueryClient();
+
+  const handleDeleteReview = (reviewid: string) => {
+    deleteReview(reviewid, {
+      onSuccess: async (data) => {
+        console.log(data);
+        setOpen(false);
+        toast.success(data.message);
+        await queryClient.invalidateQueries({ queryKey: ["myOrders"] });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data.message || "Failed to delete review");
+      },
+    });
+  };
   if (isLoading) return <Loader />;
 
   if (!data?.orders?.length) {
@@ -70,7 +101,59 @@ function MyOrders() {
                 <span className="text-lg">{order.totalAmount}</span>
               </div>
             </div>
-            {order.status === "delivered" && <Review orderId={order._id} />}
+            {order.status === "delivered" && (
+              <Review
+                orderId={order._id}
+                existingReview={
+                  order.review
+                    ? {
+                        reviewId: order.review._id,
+                        foodRating: order.review.foodRating,
+                        deliveryRating: order.review.deliveryRating,
+                        comment: order.review.comment,
+                      }
+                    : undefined
+                }
+              />
+            )}
+            {order.status === "delivered" && order.hasReview && (
+              <div>
+                <Button
+                  onClick={() => setOpen(true)}
+                  className="text-red-500 border-2 hover:bg-transparent border-red-700 bg-transparent mt-2 w-full cursor-pointer"
+                >
+                  Delete Your Review
+                </Button>
+                <AlertDialog open={open} onOpenChange={setOpen}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your review
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={isDeleting}
+                        onClick={() =>
+                          handleDeleteReview(order.review?._id as string)
+                        }
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          "Continue"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            )}
             <Separator className="my-1" />
           </div>
         ))}
