@@ -61,6 +61,13 @@ export interface Order {
   razorpayOrderId: string;
   razorpayPaymentId: string;
   paymentStatus: "unpaid" | "paid" | "failed";
+  hasReview: boolean;
+  review: {
+    _id: string;
+    foodRating: number;
+    deliveryRating: number;
+    comment: string;
+  } | null;
   createdAt: string;
 }
 
