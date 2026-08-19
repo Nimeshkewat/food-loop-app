@@ -10,6 +10,7 @@ export interface Restaurant {
   deliveryTime: number;
   cuisines: string[];
   imageUrl: string;
+  averageRating: number;
   menus: Menu[];
   createdAt: string;
   updatedAt: string;
@@ -27,6 +28,11 @@ export interface RestaurantResponse {
   success: boolean;
   message: string;
   restaurant: Restaurant;
+}
+
+export interface RestaurantsResponse {
+  success: boolean;
+  restaurants: Restaurant[];
 }
 
 // Search Restaurant Respones
