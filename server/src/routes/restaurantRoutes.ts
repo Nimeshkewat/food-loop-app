@@ -2,6 +2,7 @@ import express from "express";
 import {
   createRestaurant,
   deleteRestaurant,
+  getAllRestaurants,
   getRestaurant,
   getRestaurantOrders,
   getRestaurantWithFilters,
@@ -27,6 +28,8 @@ router.delete("/delete", isAuthenticated, deleteRestaurant);
 
 router.get("/orders", isAuthenticated, getRestaurantOrders);
 router.get("/search/:searchText", getRestaurantWithFilters);
+
+router.get("/all", getAllRestaurants);
 router.get("/:restaurantId", getSingleRestaurant);
 
 export default router;
