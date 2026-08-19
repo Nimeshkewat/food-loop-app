@@ -1,5 +1,5 @@
-import { useState, type SubmitEvent } from "react";
-import { Star, Utensils, Bike } from "lucide-react";
+import { useState, useEffect, type SubmitEvent } from "react";
+import { Star, Utensils, Bike, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,43 +13,78 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useCreateReview } from "@/hooks/review/useCreateReview";
+import { useUpdateReview } from "@/hooks/review/useUpdateReview";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { ApiError } from "@/types/api";
 
-export function Review({ orderId }: { orderId: string }) {
+interface ReviewProps {
+  orderId: string;
+  existingReview?: {
+    reviewId: string;
+    foodRating: number;
+    deliveryRating: number;
+    comment: string;
+  };
+}
+
+export function Review({ orderId, existingReview }: ReviewProps) {
+  const isEditMode = !!existingReview;
+
   const [open, setOpen] = useState(false);
-  const [foodRating, setFoodRating] = useState(0);
+  const [foodRating, setFoodRating] = useState(existingReview?.foodRating ?? 0);
   const [hoveredFoodRating, setHoveredFoodRating] = useState(0);
 
-  const [deliveryRating, setDeliveryRating] = useState(0);
+  const [deliveryRating, setDeliveryRating] = useState(
+    existingReview?.deliveryRating ?? 0,
+  );
   const [hoveredDeliveryRating, setHoveredDeliveryRating] = useState(0);
+  const [comment, setComment] = useState(existingReview?.comment ?? "");
 
-  const [comment, setComment] = useState("");
-
-  const { mutate, isPending } = useCreateReview();
+  const { mutate: createReview, isPending: isCreating } = useCreateReview();
+  const { mutate: updateReview, isPending: isUpdating } = useUpdateReview();
   const queryClient = useQueryClient();
+
+  const isPending = isCreating || isUpdating;
+
+  useEffect(() => {
+    if (existingReview) {
+      setFoodRating(existingReview.foodRating);
+      setDeliveryRating(existingReview.deliveryRating);
+      setComment(existingReview.comment);
+    }
+  }, [existingReview]);
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    mutate(
+    const onSuccess = async (data: { message: string }) => {
+      toast.success(data.message);
+      setOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["myOrders"] });
+    };
+    const onError = (error: ApiError) => {
+      toast.error(
+        error?.response?.data?.message ||
+          `Failed to ${isEditMode ? "update" : "create"} review`,
+      );
+    };
+
+    if (isEditMode) {
+      updateReview(
+        {
+          reviewId: existingReview.reviewId,
+          foodRating,
+          deliveryRating,
+          comment,
+        },
+        { onSuccess, onError },
+      );
+      return;
+    }
+    createReview(
       { orderId, foodRating, deliveryRating, comment },
-      {
-        onSuccess: async (data) => {
-          console.log(data);
-          toast.success(data.message);
-          setOpen(false);
-          setFoodRating(0);
-          setDeliveryRating(0);
-          setComment("");
-          await queryClient.invalidateQueries({ queryKey: ["myOrders"] });
-        },
-        onError: (error) => {
-          toast.error(
-            error?.response?.data.message || "Failed to create review",
-          );
-        },
-      },
+      { onSuccess, onError },
     );
   };
 
@@ -89,19 +124,26 @@ export function Review({ orderId }: { orderId: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="mt-2 w-full cursor-pointer bg-primary py-1 rounded-lg text-white dark:text-black">
-        Leave a Review
+      <DialogTrigger
+        className={`mt-2 w-full cursor-pointer py-1 rounded-lg ${
+          isEditMode
+            ? "border border-primary text-primary"
+            : "bg-primary text-white dark:text-black"
+        }`}
+      >
+        {isEditMode ? "Edit Review" : "Leave a Review"}
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle className="text-xl">How was your order?</DialogTitle>
+          <DialogTitle className="text-xl">
+            {isEditMode ? "Update your review" : "How was your order?"}
+          </DialogTitle>
           <DialogDescription>
             Help Food Loop and your driver improve by leaving feedback.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-2">
-          {/* Food Rating */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Utensils className="h-4 w-4 text-muted-foreground" />
@@ -115,7 +157,6 @@ export function Review({ orderId }: { orderId: string }) {
             )}
           </div>
 
-          {/* Delivery Rating */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Bike className="h-4 w-4 text-muted-foreground" />
@@ -129,7 +170,6 @@ export function Review({ orderId }: { orderId: string }) {
             )}
           </div>
 
-          {/* Written Feedback */}
           <div className="space-y-2">
             <Label htmlFor="review-comment" className="text-sm font-semibold">
               Your Review
@@ -146,7 +186,13 @@ export function Review({ orderId }: { orderId: string }) {
 
           <DialogFooter>
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Submitting..." : "Submit Review"}
+              {isPending ? (
+                <Loader2 className="animate-spin" />
+              ) : isEditMode ? (
+                "Update Review"
+              ) : (
+                "Submit Review"
+              )}
             </Button>
           </DialogFooter>
         </form>
