@@ -8,7 +8,6 @@ import { useGetAllRestaurants } from "@/hooks/restaurant/useGetAllRestaurant";
 import Loader from "../ui/Loader";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { AspectRatio } from "../ui/aspect-ratio";
-import { Badge } from "../ui/badge";
 
 function HeroSection() {
   const [search, setSearch] = useState("");
