@@ -30,7 +30,7 @@ Razorpay, Cloudinary, Nodemailer
 ### Prerequisites
 
 - Node.js
-- MongoDB (local or Atlas)
+- MongoDB (Atlas)
 
 ### Installation
 
@@ -41,7 +41,7 @@ git clone <your-repo-url>
 
 cd server
 npm install
-npm run dev
+npm run server
 
 # Frontend
 
