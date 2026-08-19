@@ -220,3 +220,38 @@ export const getSingleRestaurant = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: errorMessage });
   }
 };
+
+export const getAllRestaurants = async (req: Request, res: Response) => {
+  try {
+    const restaurants = await Restaurant.aggregate([
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "restaurant",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: [
+              { $eq: [{ $size: "$reviews" }, 0] },
+              0,
+              { $avg: "$reviews.foodRating" },
+            ],
+          },
+        },
+      },
+      { $sort: { averageRating: -1 } },
+      { $limit: 5 },
+      { $project: { reviews: 0 } },
+    ]);
+
+    res.status(200).json({ success: true, restaurants });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ success: false, message: errorMessage });
+  }
+};
