@@ -3,6 +3,7 @@ import crypto from "crypto";
 import instance from "../config/razorpay.js";
 import Order from "../models/orderModel.js";
 import Review from "../models/reviewModel.js";
+import Cart from "../models/cartModel.js";
 
 //* 1. CHECKOUT — called when the user clicks "Place Order" on the frontend.
 //*    Creates a Razorpay order + a matching Mongo order (status: pending),
@@ -69,6 +70,7 @@ export const checkout = async (req: Request, res: Response) => {
 //*    authoritative confirmation in case this call never happens.)
 export const verify = async (req: Request, res: Response) => {
   try {
+    const { id } = req.user;
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
 
@@ -110,6 +112,12 @@ export const verify = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ success: false, message: "Order not found" });
+    }
+
+    const cart = await Cart.findOne({ user: id }).exec();
+    if (cart) {
+      cart.items = [];
+      await cart.save();
     }
 
     return res.status(200).json({
