@@ -48,7 +48,7 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useProfile } from "@/hooks/auth/useProfile";
 
 function Navbar() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { data } = useGetCart();
   const { data: user } = useProfile();
   const cartLength = data?.cart?.items?.length || 0;
@@ -109,19 +109,18 @@ function Navbar() {
 
           <div className="flex items-center gap-4">
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" />}>
-                <Sun />
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    onClick={() =>
+                      setTheme(theme === "light" ? "dark" : "light")
+                    }
+                    variant="outline"
+                  />
+                }
+              >
+                {theme === "light" ? <Sun /> : <Moon />}
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setTheme("light")}>
-                    <Sun /> Light
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    <Moon /> Dark
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
             </DropdownMenu>
 
             <Link to="/cart" className="relative cursor-pointer">
@@ -176,7 +175,7 @@ const MobileNavbar = ({
   const { data } = useProfile();
 
   const { isPending } = useLogout();
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -198,19 +197,18 @@ const MobileNavbar = ({
           <SheetHeader className="flex flex-row items-center justify-between">
             <SheetTitle>Food Loop</SheetTitle>
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" />}>
-                <Sun />
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    onClick={() =>
+                      setTheme(theme === "light" ? "dark" : "light")
+                    }
+                    variant="outline"
+                  />
+                }
+              >
+                {theme === "light" ? <Sun /> : <Moon />}
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setTheme("light")}>
-                    <Sun /> Light
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    <Moon /> Dark
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
             </DropdownMenu>
           </SheetHeader>
           <Separator />
