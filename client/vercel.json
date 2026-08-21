@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "/https://restaurant-app-backend-vw4e.onrender.com/api/v1"
     }
   ]
 }
