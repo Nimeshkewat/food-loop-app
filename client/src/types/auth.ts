@@ -82,3 +82,15 @@ export interface UpdateProfileResponse {
   message: string;
   user: User;
 }
+
+// Change password
+export interface ChangePasswordInputState {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  success: string;
+  message: string;
+}

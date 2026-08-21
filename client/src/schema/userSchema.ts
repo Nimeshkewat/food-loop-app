@@ -20,3 +20,9 @@ export const userResetPasswordSchema = z.object({
   password: z.string().min(8, "Password must be atleast 8 characters"),
   confirmPassword: z.string().min(8, "Password must be atleast 8 characters"),
 });
+
+export const userChangePasswordSchema = z.object({
+  oldPassword: z.string().min(8, "Password must be atleast 8 characters"),
+  newPassword: z.string().min(8, "Password must be atleast 8 characters"),
+  confirmPassword: z.string().min(8, "Password must be atleast 8 characters"),
+});
