@@ -11,6 +11,7 @@ import { useProfileUpdate } from "@/hooks/auth/useProfileUpdate";
 import { useQueryClient } from "@tanstack/react-query";
 import Loader from "@/components/ui/Loader";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const { data, isLoading } = useProfile();
@@ -42,6 +43,7 @@ function Profile() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [apiError, setApiError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (data) {
@@ -254,7 +256,7 @@ function Profile() {
         </Card>
       </div>
 
-      <div className="text-center mt-8">
+      <div className="flex flex-col gap-2 items-center text-center mt-8">
         <Button
           onClick={handleSubmit}
           disabled={isPending || !hasChanges}
@@ -265,6 +267,12 @@ function Profile() {
           ) : (
             "Update Profile"
           )}
+        </Button>
+        <Button
+          onClick={() => navigate("/change-password")}
+          className="w-full md:w-1/3 py-6 text-md font-semibold"
+        >
+          Change Password
         </Button>
       </div>
     </div>

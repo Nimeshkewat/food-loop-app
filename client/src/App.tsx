@@ -21,6 +21,7 @@ import Loader from "./components/ui/Loader";
 import NotFound from "./pages/not-found/NotFound";
 import MyOrders from "./pages/order/MyOrders";
 import Success from "./pages/order/Success";
+import ChangePassword from "./pages/auth/ChangePassword";
 
 function App() {
   const { isLoading } = useAuth();
@@ -64,6 +65,14 @@ function App() {
           element={
             <PrivateRoute>
               <Success />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <PrivateRoute>
+              <ChangePassword />
             </PrivateRoute>
           }
         />
