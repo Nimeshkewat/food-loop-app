@@ -54,3 +54,14 @@ export const uploadImageLimiter = rateLimit({
     message: "Too many upload image attempts. Please try again later.",
   },
 });
+
+export const changePasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many password change attempts. Please try again later.",
+  },
+});

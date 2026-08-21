@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  changePassword,
   checkAuth,
   deleteUserAccount,
   forgotPassword,
@@ -14,6 +15,7 @@ import {
 import isAuthenticated from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
 import {
+  changePasswordLimiter,
   loginLimiter,
   registerLimiter,
   uploadImageLimiter,
@@ -30,6 +32,12 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 router.get("/check-auth", isAuthenticated, checkAuth);
+router.put(
+  "/change-password",
+  changePasswordLimiter,
+  isAuthenticated,
+  changePassword,
+);
 
 router.get("/profile", isAuthenticated, getProfile);
 router.patch(
