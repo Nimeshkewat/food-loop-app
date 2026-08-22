@@ -4,7 +4,7 @@ A full-stack food ordering platform where users can browse restaurants,
 order food, and pay online — and restaurant owners can manage their menu
 and track incoming orders.
 
-🔗 \*\*Live Demo: https://restaurant-app-frontend-black.vercel.app
+🔗 \*\*Live Demo: https://food-loop-frontend-black.vercel.app/
 
 ## Features
 
