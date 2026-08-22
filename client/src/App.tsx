@@ -22,6 +22,7 @@ import NotFound from "./pages/not-found/NotFound";
 import MyOrders from "./pages/order/MyOrders";
 import Success from "./pages/order/Success";
 import ChangePassword from "./pages/auth/ChangePassword";
+import Analytics from "./pages/admin/Analytics";
 
 function App() {
   const { isLoading } = useAuth();
@@ -78,6 +79,14 @@ function App() {
         />
 
         {/* Admin */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <Analytics />
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/restaurant"
           element={

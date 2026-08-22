@@ -12,6 +12,7 @@ import menuRouter from "./routes/menuRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import cartRouter from "./routes/cartRoutes.js";
 import reviewRouter from "./routes/reviewRoutes.js";
+import analyticsRouter from "./routes/analyticsRoutes.js";
 
 import { webhook } from "./controllers/orderController.js";
 
@@ -47,5 +48,6 @@ app.use("/api/v1/menus", menuRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/analytics", analyticsRouter);
 
 export default app;
