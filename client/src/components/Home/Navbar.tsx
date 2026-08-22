@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import {
   HandPlatter,
   Home,
+  LayoutDashboard,
   Loader2,
   Menu,
   Moon,
@@ -85,6 +86,9 @@ function Navbar() {
                   <MenubarTrigger>Dashboard</MenubarTrigger>
                   <MenubarContent>
                     <MenubarGroup>
+                      <MenubarItem>
+                        <Link to="/admin/dashboard">Dashboard</Link>
+                      </MenubarItem>
                       <MenubarItem>
                         <Link to="/admin/restaurant">Restaurant</Link>
                       </MenubarItem>
@@ -237,12 +241,12 @@ const MobileNavbar = ({
             )}
             {isAuthenticated && isAdmin && (
               <Link
-                to="/admin/menu"
+                to="/admin/dashboard"
                 className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
                 onClick={() => setIsOpen(false)}
               >
-                <SquareMenu />
-                <span>Menu</span>
+                <LayoutDashboard />
+                <span>Restaurant</span>
               </Link>
             )}
             {isAuthenticated && isAdmin && (
@@ -253,6 +257,16 @@ const MobileNavbar = ({
               >
                 <UtensilsCrossed />
                 <span>Restaurant</span>
+              </Link>
+            )}
+            {isAuthenticated && isAdmin && (
+              <Link
+                to="/admin/menu"
+                className="flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-gray-800 py-2 px-4"
+                onClick={() => setIsOpen(false)}
+              >
+                <SquareMenu />
+                <span>Menu</span>
               </Link>
             )}
             {isAuthenticated && isAdmin && (
